@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+</head>
+
+<body>
+    <script src="../gui/libs/threemin.js"></script>
+    <script src="../gui/scripts/input.js"></script>
+    <script src="../gui/scripts/camera.js"></script>
+
+    <script>
+        class Terrain {
+            constructor() {
+                this.mapSize = 2048;
+                this.indiceWorlSize = 5000;
+                var indiceSize = 128;
+
+                //this.mapSize = 4;
+                //this.indiceWorlSize = 1000;
+                //var indiceSize = 2;
+
+                let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
+                let planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.BackSide });
+                let planeWireMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.05 });
+
+                this._meshes = [];
+                this._grid = [];
+                this._indiceSize = indiceSize + 1;
+
+
+                let split = this.mapSize / indiceSize;
+                //let split = indiceSize;
+
+                for (let x = 0; x < split; x++) {
+                    for (let z = 0; z < split; z++) {
+                        let geometryClone = planeGeometry.clone();
+                        let mesh = new THREE.Mesh(geometryClone, planeMaterial)
+                        let grid = new THREE.Mesh(geometryClone, planeWireMaterial)
+
+                        mesh.rotation.x = Math.PI / 2;
+                        grid.rotation.x = Math.PI / 2;
+
+                        mesh.position.x = this.indiceWorlSize * x - this.indiceWorlSize * (split - 1) / 2;
+                        mesh.position.z = this.indiceWorlSize * z - this.indiceWorlSize * (split - 1) / 2;
+
+                        grid.position.x = this.indiceWorlSize * x - this.indiceWorlSize * (split - 1) / 2;
+                        grid.position.z = this.indiceWorlSize * z - this.indiceWorlSize * (split - 1) / 2;
+
+                        this._meshes.push(mesh);
+                        this._grid.push(grid);
+                    }
+                }
+
+            }
+            addToScene(scene) {
+
+                this._meshes.forEach(mesh => {
+                    scene.add(mesh)
+                });
+
+                this._grid.forEach(grid => {
+                    scene.add(grid)
+                });
+            }
+        }
+    </script>
+
+
+    <script>
+
+
+        //Scene stuff
+        var scene, renderer;
+
+
+        function init() {
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xbab8b4);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.x = 0;
+            scene.add(directionalLight);
+
+            terrain = new Terrain();
+            terrain.addToScene(scene);
+
+            Inputs.init();
+            Camera.init();
+        }
+
+
+        function render() {
+            Camera.update();
+            renderer.render(scene, Camera.ThreeCamera);
+
+        }
+
+
+
+        init();
+        render();    
+    </script>
+
+
+</body>
+
+</html>

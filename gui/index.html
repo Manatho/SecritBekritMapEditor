@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="style/index.css">
+    <title>MapEditor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+
+</head>
+
+<body oncontextmenu="return false;" style="margin: 0; padding: 0">
+
+    <script src="libs/threemin.js"></script>
+    <script src="libs/MouseLock.js"></script>
+    <script src="libs/mousetrap.min.js"></script>
+
+    <script src="scripts/camera.js"></script>
+    <script src="scripts/input.js"></script>
+    <script src="scripts/tools.js"></script>
+    <script src="scripts/terrain.js"></script>
+    <script src="scripts/main.js"></script>
+   <!-- <script src="scripts/tool-effect-visualiser.js"></script> -->
+
+    <script src="libs/pako_inflate.min.js"></script>
+    <script src="libs/pako_deflate.min.js"></script>
+    <script src="libs/pako.min.js"></script>
+    <script src="scripts/PNG160.js"></script>
+
+    <div class="toolbar">
+        <img id="png" width="350" height="350" style="image-rendering: pixelated">
+        <label class="toolbar-button-conatiner">
+            <input type="radio" name="toolbutton" value="deincrease" checked="checked" key="1" />
+            <div class="toolbar-button">
+                <img draggable="false" class="toolbar-icon" src="style/icons/in-decrease.png">
+            </div>
+        </label>
+        <hr class="spacer">
+        <label class="toolbar-button-conatiner">
+            <input type="radio" name="toolbutton" value="average" key="2" />
+            <div class="toolbar-button">
+                <img draggable="false" class="toolbar-icon" src="style/icons/average.png">
+            </div>
+        </label>
+        <hr class="spacer">
+        <div class="toolbar-number-container">
+            <label for="strength">Strength:</label>
+            <input type="number" id="strength" step="1" value="5" min="0" />
+        </div>
+        <hr class="spacer">
+        <div class="toolbar-number-container">
+            <label for="size">Size:</label>
+            <input type="number" id="size" step="1" value="1" min="1" />
+        </div>
+        <hr>
+        <div class="toolbar-button" id="export">
+            <img draggable="false" class="toolbar-icon" src="style/icons/export.png">
+        </div>
+        <a download="heightmap.png" id="downloadlink" style="display: none"></a>
+
+    </div>
+
+    <script>
+        {
+
+
+
+            //Tool buttons:
+            let toolbuttons = document.getElementsByName('toolbutton')
+            toolbuttons.forEach(button => {
+                Mousetrap.bind(button.getAttribute("key"), changeTool)
+                button.addEventListener("change", changeTool);
+
+                function changeTool() {
+                    button.checked = true;
+                    Tools.tool = Tools.availableTools[button.value]
+                    sizeInput.value = Tools.tool.size;
+                }
+            })
+
+
+            //Stength
+            let strengthInput = document.getElementById("strength");
+            let numberfocusStrength = false;
+            let mousedownStrength = false;
+            let mousedownEventStrength;
+            strengthInput.addEventListener("keydown", (event) => {
+                if (event.key == "Enter" || event.key == "Escape") {
+                    strengthInput.blur();
+                }
+            })
+            strengthInput.addEventListener("blur", (event) => {
+                numberfocusStrength = false;
+                strengthInput.value = Math.max(strengthInput.value, 0)
+                Tools.tool.strength = strengthInput.value;
+
+            });
+
+            strengthInput.addEventListener("focus", (event) => {
+                numberfocusStrength = true;
+            });
+
+            strengthInput.addEventListener("mousedown", (event) => {
+                mousedownStrength = true;
+                strengthInput.setPointerCapture(1);
+                mousedownEventStrength = event;
+                mousedownEventStrength.strength = strengthInput.value;
+
+            });
+
+            strengthInput.addEventListener("mouseup", (event) => {
+                mousedownStrength = false;
+            });
+
+            strengthInput.addEventListener("mousemove", (event) => {
+                if (mousedownStrength) {
+                    let difference = ((mousedownEventStrength.y - event.y) / 10) >> 0;
+                    strengthInput.value = Number.parseInt(mousedownEventStrength.strength) + Number.parseInt(difference);
+                }
+            });
+
+            document.addEventListener("mousedown", () => {
+                if (numberfocusStrength) {
+                    strengthInput.blur();
+                }
+            })
+
+            //Size
+            let sizeInput = document.getElementById("size");
+            let numberfocusSize = false;
+            let mousedownSize = false;
+            let mousedownEventSize;
+            sizeInput.addEventListener("keydown", (event) => {
+                if (event.key == "Enter" || event.key == "Escape") {
+                    sizeInput.blur();
+                }
+            })
+            sizeInput.addEventListener("blur", (event) => {
+                numberfocusSize = false;
+                sizeInput.value = Math.max(sizeInput.value, 1)
+                Tools.tool.size = sizeInput.value;
+
+            });
+
+            sizeInput.addEventListener("focus", (event) => {
+                numberfocusSize = true;
+            });
+
+            sizeInput.addEventListener("mousedown", (event) => {
+                mousedownSize = true;
+                sizeInput.setPointerCapture(1);
+                mousedownEventSize = event;
+                mousedownEventSize.strength = sizeInput.value;
+
+            });
+
+            sizeInput.addEventListener("mouseup", (event) => {
+                mousedownSize = false;
+                if (sizeInput.value != mousedownEventSize.strength) {
+                    sizeInput.blur();
+                }
+            });
+
+            sizeInput.addEventListener("mousemove", (event) => {
+                if (mousedownSize) {
+                    let difference = ((mousedownEventSize.y - event.y) / 10) >> 0;
+                    sizeInput.value = Number.parseInt(mousedownEventSize.strength) + Number.parseInt(difference);
+                }
+            });
+
+            document.addEventListener("mousedown", () => {
+                if (numberfocusSize) {
+                    sizeInput.blur();
+                }
+            })
+
+            //Export button
+            var sizeincrease = 4;
+            let exportButton = document.getElementById("export");
+
+            exportButton.addEventListener("click", (event) => {
+                console.log(event);
+
+                const lerp = (num, in_min, in_max, out_min, out_max) => {
+                    lerped = (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+
+                    if (lerped < out_min || lerped > out_max) {
+                        return Math.max(Math.min(lerped, out_max), out_min)
+
+                    }
+
+
+                    return lerped;
+                }
+
+                //console.log("-....................................");
+
+
+                let heightmap = terrain.getHeightValues();
+                let doublemap = [];
+
+                let index = 0;
+                let indexoff = 0;
+                
+                let lineindex = 0;
+                heightmap.forEach((h, i) => {
+                    //console.log(i % 4, i);
+                    if (i % (terrain.mapSize + 1) == 0 && i != 0) {
+                        index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
+                        lineindex++;
+                    }
+
+
+
+                    for (let y = i; y < sizeincrease + i; y++) {
+                        for (let w = 0; w < sizeincrease; w++) {
+                            if (lineindex / terrain.mapSize == 1 && w + 1 == sizeincrease) {
+                            } else if (i % terrain.mapSize + 1 == terrain.mapSize && y + 1 == sizeincrease + i) {
+                                //doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1))- indexoff] = 50
+                            }
+                            else {
+                                doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1)) - indexoff] = h
+                            }
+
+                        }
+                    }
+                    index += sizeincrease - 1;
+                });
+                heightmap = [];
+
+                doublemap = doublemap.filter(i => i != null);
+                console.log(heightmap);
+                console.log(doublemap);
+
+
+
+                let pngdata = PNG160.createPNG(sizeincrease * (terrain.mapSize + 1) - 1, sizeincrease * (terrain.mapSize + 1) - 1, (w, h, i) => {
+
+
+
+                    return lerp(doublemap[i], max, min, 0, 65535);
+
+
+                })
+
+
+
+
+                //var link = document.getElementById('downloadlink');
+                //link.href = makepngfile(pngdata);
+                //link.click();
+
+                document.getElementById('png').src = makepngfile(pngdata);
+
+            })
+
+            var max = 390;
+            var min = -1110;
+
+            var pngfile = null;
+            let makepngfile = function (image) {
+                var data = new Blob([image], { type: 'image/png' });
+
+                // If we are replacing a previously generated file we need to
+                // manually revoke the object URL to avoid memory leaks.
+                if (pngfile !== null) {
+                    window.URL.revokeObjectURL(pngfile);
+                }
+
+                pngfile = window.URL.createObjectURL(data);
+
+                return pngfile;
+            };
+
+
+
+        }
+
+
+
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>
