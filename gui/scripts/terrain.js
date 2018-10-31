@@ -1,14 +1,13 @@
 class Terrain {
     constructor() {
-        this.mapSize = 1024;
-        this.indiceWorlSize = 5000;
-        var indiceSize = 128;
-
+        //this.mapSize = 4096;  this.indiceWorlSize = 10000;  var indiceSize = 128;
+        this.mapSize = 2048;  this.indiceWorlSize = 5000;  var indiceSize = 128;
+       //this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
         //this.mapSize = 4;
         //this.indiceWorlSize = 1000;
         //var indiceSize = 2;
 
-        let planeGeometry = new THREE.PlaneGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
+        let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
         let planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.BackSide });
         let planeWireMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.05 });
 
@@ -92,7 +91,16 @@ class Terrain {
         let min = Number.MAX_VALUE, max = 0;
 
         this._meshes.forEach(mesh => {
-            mesh.geometry.vertices.forEach(vertex => {
+
+            //mesh.geometry.vertices.forEach(vertex => {
+                console.log( mesh.geometry.attributes.position.count);
+                
+            for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
+
+
+
+                let vertex = getVertex(mesh.geometry, i);
+
                 let pos = mesh.position.clone();
                 pos.y = vertex.z;
 
@@ -118,7 +126,8 @@ class Terrain {
                 if (pos.y > 0) {
 
                 }
-            })
+
+            }//)
         });
 
         return height
@@ -138,9 +147,13 @@ class Terrain {
             let distance = Number.MAX_VALUE;
             let closest = null;
 
+
             //Find closest vertex
             faceVerticesIndexes.forEach((vertexIndex) => {
-                var vertex = intersects[0].object.geometry.vertices[vertexIndex].clone();
+
+                let vertex = getVertex(intersects[0].object.geometry, vertexIndex);
+                //var vertex = intersects[0].object.geometry.vertices[vertexIndex].clone();
+
                 vertex.applyMatrix4(intersects[0].object.matrixWorld);
                 let newdistance = intersects[0].point.distanceTo(vertex);
 
@@ -175,13 +188,13 @@ class Terrain {
 
                     //Neighbour is only set if index is not the initial target
                     if (indexer.neighbour == null) {
-                        verticesToTransform.push({ vertex: target.geometry.vertices[indexer.index], index: brushindex, worldMatrix: target.matrixWorld })
+                        verticesToTransform.push({ vertex: getVertex(target.geometry, indexer.index), index: brushindex, mesh: target })
 
                         //If on the edge of an object, the touching vertices of the neighbour should be updated aswell
                         indexer.edgeSharingNeighbours.forEach(sharer => {
                             let targetNeighbour = target.neighbour[sharer.neighbour];
                             if (targetNeighbour != null) {
-                                verticesToTransform.push({ vertex:targetNeighbour.geometry.vertices[sharer.index], index: brushindex, worldMatrix: targetNeighbour.matrixWorld })
+                                verticesToTransform.push({ vertex: getVertex(targetNeighbour.geometry, sharer.index), index: brushindex, mesh: targetNeighbour })
                                 meshgeometriesToUpdate.push(targetNeighbour.geometry);
                             }
                         });
@@ -189,13 +202,13 @@ class Terrain {
                         //If the index fall within a neighbour, do the same as above with the neighbour as the target
                         let targetNeighbour = target.neighbour[indexer.neighbour];
                         if (targetNeighbour != null) {
-                            verticesToTransform.push({ vertex: targetNeighbour.geometry.vertices[indexer.index], index: brushindex, worldMatrix: targetNeighbour.matrixWorld })
+                            verticesToTransform.push({ vertex: getVertex(targetNeighbour.geometry, indexer.index), index: brushindex, mesh: targetNeighbour })
                             meshgeometriesToUpdate.push(targetNeighbour.geometry);
 
                             indexer.edgeSharingNeighbours.forEach(sharer => {
                                 targetNeighbour = targetNeighbour.neighbour[sharer.neighbour];
                                 if (targetNeighbour != null) {
-                                    verticesToTransform.push({ vertex: targetNeighbour.geometry.vertices[sharer.index], index: brushindex, worldMatrix: targetNeighbour.matrixWorld  })
+                                    verticesToTransform.push({ vertex: getVertex(targetNeighbour.geometry, sharer.index), index: brushindex, mesh: targetNeighbour })
                                     meshgeometriesToUpdate.push(targetNeighbour.geometry);
                                 }
                             });
@@ -215,13 +228,11 @@ class Terrain {
                 if (!indexedVertices[element.index.y])
                     indexedVertices[element.index.y] = []
 
-                if(indexedVertices[element.index.y][element.index.x]){
-                    indexedVertices[element.index.y][element.index.x]._vertices.push(element.vertex);
-                } else {
-                    indexedVertices[element.index.y][element.index.x] = new ToolableVertex(element.vertex, element.worldMatrix)
+                if (!indexedVertices[element.index.y][element.index.x]) {
+                    indexedVertices[element.index.y][element.index.x] = new ToolableVertex(element.vertex, element.mesh)
                 }
-
-                
+                indexedVertices[element.index.y][element.index.x]._vertices.push(element.vertex);
+                indexedVertices[element.index.y][element.index.x]._meshes.push(element.mesh);
             });
 
 
@@ -230,10 +241,13 @@ class Terrain {
     }
 
     updateGeometries(meshgeometriesToUpdate) {
+        //console.log(meshgeometriesToUpdate);
+
         meshgeometriesToUpdate.forEach(element => {
             element.computeFaceNormals();
             element.computeVertexNormals();
-            element.verticesNeedUpdate = true;
+            element.attributes.position.needsUpdate = true;
+            //element.verticesNeedUpdate = true;
             element.normalsNeedUpdate = true;
         })
         render();
@@ -302,53 +316,76 @@ class Terrain {
     }
 }
 
-class ToolableVertex {
-    constructor(vertices, worldMatrix) {
-        if (!Array.isArray(vertices)) {
-            vertices = [vertices];
-        }
-        this._vertices = vertices
-        this.worldMatrix = worldMatrix;
+function getVertex(geometry, index) {
+
+    let positions = geometry.attributes.position.array;
+    let x = positions[index * 3];
+    let y = positions[index * 3 + 1];
+    let z = positions[index * 3 + 2];
+
+    if (x == undefined || y == undefined || z == undefined) {
+        return null;
     }
 
-    getHeight() {
-        return this._vertices[0].z;
+    let vertex = new THREE.Vector3(x, y, z);
+    vertex.index = index * 3;
+
+    return vertex;
+}
+
+
+class ToolableVertex {
+    constructor(vertices, meshes) {
+        if (!Array.isArray(vertices)) {
+            vertices = [vertices];
+            meshes = [meshes];
+        }
+        this._vertices = vertices
+        this._meshes = meshes
+    }
+
+    set height(value) {
+        this._meshes.forEach((mesh, index) => {
+            mesh.geometry.attributes.position.array[this._vertices[index].index + 2] = value;
+        });
+
+    }
+
+    get height() {
+        return this._meshes[0].geometry.attributes.position.array[this._vertices[0].index + 2]
     }
 
     getWorldPosition() {
-
         let vertex = this._vertices[0].clone();
-        vertex.applyMatrix4(this.worldMatrix);
-        return {x: vertex.x, y: vertex.y, z: vertex.z}
+        vertex.applyMatrix4(this._meshes[0].matrixWorld);
+        return { x: vertex.x, y: vertex.y, z: vertex.z }
     }
-
-    setHeight(height) {
-        this._vertices.forEach(vertex => {
-            vertex.z = height;
-        });
-    }
-
-    addHeight(height) {
-        this._vertices.forEach((vertex) => {
-            vertex.z += height;
-        });
-    }
-
-    subtractHeight(height) {
-        this._vertices.forEach(vertex => {
-            vertex.z -= height;
-        });
-    }
-
-    multiplyHeight(height) {
-        this._vertices.forEach(vertex => {
-            vertex.z *= height;
-        });
-    }
-
-    divideHeight(height) {
-        this._vertices.forEach(vertex => {
-            vertex.z /= height;
-        });
-    }
+    /*
+        setHeight(height) {
+    
+        }
+    
+        addHeight(height) {
+            this._vertices.forEach((vertex) => {
+                vertex.z += height;
+            });
+        }
+    
+        subtractHeight(height) {
+            this._vertices.forEach(vertex => {
+                vertex.z -= height;
+            });
+        }
+    
+        multiplyHeight(height) {
+            this._vertices.forEach(vertex => {
+                vertex.z *= height;
+            });
+        }
+    
+        divideHeight(height) {
+            this._vertices.forEach(vertex => {
+                vertex.z /= height;
+            });
+        } */
 }

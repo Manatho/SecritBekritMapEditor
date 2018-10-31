@@ -11,16 +11,26 @@ class Tool {
         function defaultScaler(brushtype) {
             switch (brushtype) {
                 case "square":
-                    console.log("Wat");
                     return (size) => {
-                        let brush = [];
+                       /* let brush = [];
                         for (let y = 0; y < size; y++) {
                             brush[y] = [];
                             for (let x = 0; x < size; x++) {
                                 brush[y][x] = 1;
                             }
                         }
-                        return brush
+                        return brush*/
+
+                        return [
+                            [0,0,1,1,1,0,0],
+                            [0,1,2,2,2,1,0],
+                            [1,2,2,3,2,2,1],
+                            [1,2,3,4,3,2,1],
+                            [1,2,3,3,2,2,1],
+                            [0,1,2,2,2,1,0],
+                            [0,0,1,1,1,0,0]
+                        ]
+
                     }
             }
         }
@@ -29,9 +39,9 @@ class Tool {
             tool.iterateBrush((x, y, strength) => {
                 if (toolableVertices[y] && toolableVertices[y][x]) {
                     if (invert) {
-                        toolableVertices[y][x].addHeight(strength * tool.strength);
+                        toolableVertices[y][x].height(strength * tool.strength);
                     } else {
-                        toolableVertices[y][x].subtractHeight(strength * tool.strength);
+                        toolableVertices[y][x].height -= (strength * tool.strength);
                     }
                 }
             })
@@ -86,11 +96,11 @@ class Tool {
         let tv = toolableVertices;
         tool.iterateBrush((x, y, strength) => {
             if (strength > 0) {
-                let average = (tv[y - 1][x - 1].getHeight() + tv[y - 1][x].getHeight() + tv[y - 1][x + 1].getHeight()
-                    + tv[y][x - 1].getHeight() + tv[y][x].getHeight() + tv[y][x + 1].getHeight()
-                    + tv[y + 1][x - 1].getHeight() + tv[y + 1][x].getHeight() + tv[y + 1][x + 1].getHeight()) / 9;
+                let average = (tv[y - 1][x - 1].height + tv[y - 1][x].height + tv[y - 1][x + 1].height
+                    + tv[y][x - 1].height + tv[y][x].height + tv[y][x + 1].height
+                    + tv[y + 1][x - 1].height + tv[y + 1][x].height + tv[y + 1][x + 1].height) / 9;
 
-                tv[y][x].setHeight(average);
+                tv[y][x].height = average;
             }
         })
     }

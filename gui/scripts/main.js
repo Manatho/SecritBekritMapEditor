@@ -39,11 +39,15 @@ function init() {
     Tools.init(terrain);
 }
 
-
+var lastTime;
 function render() {
+
+
+
+    
     Camera.update();
     renderer.render(scene, Camera.ThreeCamera);
-
+    lastTime = new Date().getTime()/ 100;
 }
 
 
