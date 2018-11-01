@@ -2,7 +2,7 @@ class Terrain {
     constructor() {
         //this.mapSize = 4096;  this.indiceWorlSize = 10000;  var indiceSize = 128;
         this.mapSize = 2048;  this.indiceWorlSize = 5000;  var indiceSize = 128;
-       //this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
+      //this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
         //this.mapSize = 4;
         //this.indiceWorlSize = 1000;
         //var indiceSize = 2;
@@ -85,14 +85,13 @@ class Terrain {
     }
 
     getHeightValues() {
-        let height = []
+        let height = new Array((this.mapSize+1)*(this.mapSize+1));
         let indice = this._indiceSize - 1;
-        
         this._meshes.forEach(mesh => {
-            let pos = mesh.position.clone();
+            
             for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
                 let vertex = getVertex(mesh.geometry, i);
-                pos.y = vertex.z;
+                let pos = mesh.position.clone();
 
                 //Transform to globalspace, map to indexes and set minimum at (0,0)
                 //(500,-500) -> (1,-1) -> (2,0)
@@ -101,7 +100,7 @@ class Terrain {
 
                 pos.x = Math.round(pos.x)
                 pos.z = Math.round(pos.z)
-                height[pos.z + pos.x * (this.mapSize + 1)] = pos.y;
+                height[pos.z + pos.x * (this.mapSize + 1)] =  vertex.z
             }
         });
 

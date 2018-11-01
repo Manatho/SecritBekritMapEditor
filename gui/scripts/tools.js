@@ -12,25 +12,14 @@ class Tool {
             switch (brushtype) {
                 case "square":
                     return (size) => {
-                       /* let brush = [];
+                        let brush = [];
                         for (let y = 0; y < size; y++) {
                             brush[y] = [];
                             for (let x = 0; x < size; x++) {
                                 brush[y][x] = 1;
                             }
                         }
-                        return brush*/
-
-                        return [
-                            [0,0,1,1,1,0,0],
-                            [0,1,2,2,2,1,0],
-                            [1,2,2,3,2,2,1],
-                            [1,2,3,4,3,2,1],
-                            [1,2,3,3,2,2,1],
-                            [0,1,2,2,2,1,0],
-                            [0,0,1,1,1,0,0]
-                        ]
-
+                        return brush
                     }
             }
         }
