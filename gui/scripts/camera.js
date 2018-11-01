@@ -6,7 +6,7 @@
     Camera = {
         ThreeCamera: {},
         init: () => {
-            Camera.ThreeCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100000);
+            Camera.ThreeCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000000);
             cameraOffset = new THREE.Vector3(0, 0, 0);
 
             Camera.ThreeCamera.position.x = radius * Math.sin(theta * Math.PI / 360) * Math.cos(phi * Math.PI / 360);
@@ -29,7 +29,7 @@
 
     let onDocumentMouseWheel = (event) => {
         event.preventDefault();
-        radius -= event.wheelDeltaY;
+        radius -= event.wheelDeltaY*10;
         
         radius = Math.max(radius, 10);
     }

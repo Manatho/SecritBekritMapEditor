@@ -21,15 +21,12 @@
     <script src="scripts/tools.js"></script>
     <script src="scripts/terrain.js"></script>
     <script src="scripts/main.js"></script>
-   <!-- <script src="scripts/tool-effect-visualiser.js"></script> -->
+    <script src="scripts/tool-effect-visualiser.js"></script>
 
-    <script src="libs/pako_inflate.min.js"></script>
-    <script src="libs/pako_deflate.min.js"></script>
-    <script src="libs/pako.min.js"></script>
-    <script src="scripts/PNG160.js"></script>
+    <script src="scripts/webworker.js"></script>
 
     <div class="toolbar">
-        <img id="png" width="350" height="350" style="image-rendering: pixelated">
+        <img id="png" width="70" height="70" style="image-rendering: pixelated">
         <label class="toolbar-button-conatiner">
             <input type="radio" name="toolbutton" value="deincrease" checked="checked" key="1" />
             <div class="toolbar-button">
@@ -182,67 +179,72 @@
             exportButton.addEventListener("click", (event) => {
                 console.log(event);
 
-                const lerp = (num, in_min, in_max, out_min, out_max) => {
-                    lerped = (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
-                    if (lerped < out_min || lerped > out_max) {
-                        return Math.max(Math.min(lerped, out_max), out_min)
-
-                    }
-
-
-                    return lerped;
-                }
 
                 //console.log("-....................................");
 
-
+                console.log("Task: 0");
                 let heightmap = terrain.getHeightValues();
-                let doublemap = [];
+                /* let doublemap = [];
+ 
+                 let index = 0;
+                 let indexoff = 0;
+                 
+                 let lineindex = 0;
+                 heightmap.forEach((h, i) => {
+                     //console.log(i % 4, i);
+                     if (i % (terrain.mapSize + 1) == 0 && i != 0) {
+                         index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
+                         lineindex++;
+                     }
+ 
+ 
+ 
+                     for (let y = i; y < sizeincrease + i; y++) {
+                         for (let w = 0; w < sizeincrease; w++) {
+                             if (lineindex / terrain.mapSize == 1 && w + 1 == sizeincrease) {
+                             } else if (i % terrain.mapSize + 1 == terrain.mapSize && y + 1 == sizeincrease + i) {
+                                 //doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1))- indexoff] = 50
+                             }
+                             else {
+                                 doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1)) - indexoff] = h
+                             }
+ 
+                         }
+                     }
+                     index += sizeincrease - 1;
+                 });
+                 heightmap = [];
+ 
+                 doublemap = doublemap.filter(i => i != null);
+                 console.log(heightmap);
+                 console.log(doublemap);
+ 
+ */
+                console.log("Task: 1");
+              //  var myworker = new Worker('./scripts/webworker.js');
+              var myworker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+                myworker.postMessage([heightmap, terrain.mapSize]);
 
-                let index = 0;
-                let indexoff = 0;
-                
-                let lineindex = 0;
-                heightmap.forEach((h, i) => {
-                    //console.log(i % 4, i);
-                    if (i % (terrain.mapSize + 1) == 0 && i != 0) {
-                        index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
-                        lineindex++;
+                myworker.onmessage = function (e) {
+                    //console.log(e);
+                    
+                    if(e.data[0] == 0){
+                        console.log(e.data[1]);
+                        
+                    } else {
+                        document.getElementById('png').src = makepngfile(e.data[1]);
                     }
+                   // result.textContent = e.data;
+                   
+                }
 
-
-
-                    for (let y = i; y < sizeincrease + i; y++) {
-                        for (let w = 0; w < sizeincrease; w++) {
-                            if (lineindex / terrain.mapSize == 1 && w + 1 == sizeincrease) {
-                            } else if (i % terrain.mapSize + 1 == terrain.mapSize && y + 1 == sizeincrease + i) {
-                                //doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1))- indexoff] = 50
-                            }
-                            else {
-                                doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1)) - indexoff] = h
-                            }
-
-                        }
+                /*let pngdata = PNG160.createPNG(terrain.mapSize + 1, terrain.mapSize + 1 , (w, h, i) => {
+                    if(i % 100000 == 0){
+                        console.log("Progress:", (i / ((terrain.mapSize + 1) * (terrain.mapSize + 1))*100) + "%",);
                     }
-                    index += sizeincrease - 1;
-                });
-                heightmap = [];
-
-                doublemap = doublemap.filter(i => i != null);
-                console.log(heightmap);
-                console.log(doublemap);
-
-
-
-                let pngdata = PNG160.createPNG(sizeincrease * (terrain.mapSize + 1) - 1, sizeincrease * (terrain.mapSize + 1) - 1, (w, h, i) => {
-
-
-
-                    return lerp(doublemap[i], max, min, 0, 65535);
-
-
-                })
+                    return lerp(heightmap[i], max, min, 0, 65535);
+                })*/
 
 
 
@@ -251,12 +253,11 @@
                 //link.href = makepngfile(pngdata);
                 //link.click();
 
-                document.getElementById('png').src = makepngfile(pngdata);
+                
 
             })
 
-            var max = 390;
-            var min = -1110;
+
 
             var pngfile = null;
             let makepngfile = function (image) {

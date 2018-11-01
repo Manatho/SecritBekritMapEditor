@@ -1,21 +1,11 @@
-
-
-//Scene stuff
 var scene, renderer;
-
-//Input stuff
-
-
-//objects
-var planeMesh, mouseIntersection;
-
 
 function init() {
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xbab8b4);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -27,25 +17,25 @@ function init() {
     terrain = new Terrain();
     terrain.addToScene(scene);
 
-    
-
-
-
-
-
-
     Inputs.init();
     Camera.init();
     Tools.init(terrain);
 }
 
+let changed = true;
+function requestRender() {
+    changed = true;
+}
 
-function render() {
-    Camera.update();
-    renderer.render(scene, Camera.ThreeCamera);
-
+function renderloop() {
+    if (changed) {
+        Camera.update();
+        renderer.render(scene, Camera.ThreeCamera);
+        changed = false;
+    }
+    requestAnimationFrame(renderloop);
 }
 
 
 init();
-render();
+renderloop();

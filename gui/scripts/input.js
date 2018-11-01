@@ -28,7 +28,7 @@
                         Inputs._actions[actionKey].methods.forEach(method => {
                             method(event)
                             if (Inputs._actions[actionKey].render) {
-                                render();
+                                requestRender();
                             }
                         });
                     } else {
