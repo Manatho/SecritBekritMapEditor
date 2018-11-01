@@ -22,14 +22,14 @@ function worker_function() {
         }
 
         let pngdata = PNG160.createPNG(e.data[1] + 1, e.data[1] + 1, (w, h, i) => {
-            if (i % 100000 == 0) {
-                console.log("Progress:", (i / ((e.data[1] + 1) * (e.data[1] + 1)) * 100) + "%");
+            let progress =  (i / ((e.data[1] + 1) * (e.data[1] + 1)) * 100);
+            if (progress % 1 < 0.00000000000001) {
+                postMessage([0, "Progress:" + progress + "%"])
             }
             return lerp(e.data[0][i], max, min, 0, 65535);
         })
 
-
-        postMessage(pngdata);
+        postMessage([1, pngdata]);
     }
 }
 

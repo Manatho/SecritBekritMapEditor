@@ -227,8 +227,16 @@
                 myworker.postMessage([heightmap, terrain.mapSize]);
 
                 myworker.onmessage = function (e) {
+                    //console.log(e);
+                    
+                    if(e.data[0] == 0){
+                        console.log(e.data[1]);
+                        
+                    } else {
+                        document.getElementById('png').src = makepngfile(e.data[1]);
+                    }
                    // result.textContent = e.data;
-                   document.getElementById('png').src = makepngfile(e.data);
+                   
                 }
 
                 /*let pngdata = PNG160.createPNG(terrain.mapSize + 1, terrain.mapSize + 1 , (w, h, i) => {
