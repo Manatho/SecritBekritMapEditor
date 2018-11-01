@@ -1,8 +1,8 @@
 class Terrain {
     constructor() {
         //this.mapSize = 4096;  this.indiceWorlSize = 10000;  var indiceSize = 128;
-        this.mapSize = 2048;  this.indiceWorlSize = 5000;  var indiceSize = 128;
-       //this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
+        //this.mapSize = 2048;  this.indiceWorlSize = 5000;  var indiceSize = 128;
+       this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
         //this.mapSize = 4;
         //this.indiceWorlSize = 1000;
         //var indiceSize = 2;

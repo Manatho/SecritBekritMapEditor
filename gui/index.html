@@ -23,6 +23,8 @@
     <script src="scripts/main.js"></script>
     <script src="scripts/tool-effect-visualiser.js"></script>
 
+    <script src="scripts/webworker.js"></script>
+
     <div class="toolbar">
         <img id="png" width="70" height="70" style="image-rendering: pixelated">
         <label class="toolbar-button-conatiner">
@@ -220,7 +222,8 @@
  
  */
                 console.log("Task: 1");
-                var myworker = new Worker('scripts/webworker.js');
+              //  var myworker = new Worker('./scripts/webworker.js');
+              var myworker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
                 myworker.postMessage([heightmap, terrain.mapSize]);
 
                 myworker.onmessage = function (e) {
