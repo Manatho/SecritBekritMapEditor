@@ -1,14 +1,4 @@
-
-
-//Scene stuff
 var scene, renderer;
-
-//Input stuff
-
-
-//objects
-var planeMesh, mouseIntersection;
-
 
 function init() {
 
@@ -27,29 +17,25 @@ function init() {
     terrain = new Terrain();
     terrain.addToScene(scene);
 
-    
-
-
-
-
-
-
     Inputs.init();
     Camera.init();
     Tools.init(terrain);
 }
 
-var lastTime;
-function render() {
+let changed = true;
+function requestRender() {
+    changed = true;
+}
 
-
-
-    
-    Camera.update();
-    renderer.render(scene, Camera.ThreeCamera);
-    lastTime = new Date().getTime()/ 100;
+function renderloop() {
+    if (changed) {
+        Camera.update();
+        renderer.render(scene, Camera.ThreeCamera);
+        changed = false;
+    }
+    requestAnimationFrame(renderloop);
 }
 
 
 init();
-render();
+renderloop();
