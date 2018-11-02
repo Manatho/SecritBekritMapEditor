@@ -3,12 +3,9 @@
 
 <head>
     <link rel="stylesheet" href="style/index.css">
-    <link rel="stylesheet" href="style/taskmodal.css">
     <title>MapEditor</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-
 </head>
 
 <body oncontextmenu="return false;" style="margin: 0; padding: 0">
@@ -26,62 +23,8 @@
 
     <script src="scripts/webworker.js"></script>
 
-
-    <!-- Trigger/Open The Modal -->
-    <button id="myBtn">Open Modal</button>
-
-    <div id="loadingmodal" class="progressbar-modal">
-        <div class="progressbar-modal-content">
-
-            <div class="progressbar-border">
-                <div id="progressbar" class="progressbar"></div>
-                <div id="message" class="progressbar-message">Hej</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        {
-            let modal = document.getElementById("loadingmodal");
-            let progressbar = document.getElementById("progressbar");
-            let message = document.getElementById("message");
-
-
-            var ProgressBarController = {
-                start: () => {
-                    modal.style.display = "block";
-                    progressbar.style.width = 0 + "%";
-                },
-
-                stop: () => {
-                    modal.style.display = "none";
-                },
-
-                setMessage: (m) => {
-                    message.innerHTML = m;
-                },
-
-                setProgress: (p) => {
-                    progressbar.style.display = "block";
-                    progressbar.style.width = p + "%";
-                },
-
-                progressVisible: (yes) => {
-                    if (!yes) {
-                        progressbar.style.display = "none";
-                    } else {
-                        progressbar.style.display = "block";
-                    }
-                }
-
-            }
-
-        }
-
-
-
-    </script>
-
+    <!-- GUI ELEMENTS -->
+    <script src="module/progressbar/Progressbar.js"></script>
 
     <div class="toolbar">
         <img id="png" width="70" height="70" style="image-rendering: pixelated">
@@ -118,8 +61,6 @@
 
     <script>
         {
-
-
 
             //Tool buttons:
             let toolbuttons = document.getElementsByName('toolbutton')
@@ -235,7 +176,7 @@
             let exportButton = document.getElementById("export");
 
             exportButton.addEventListener("click", (event) => {
-                console.log(event);
+            console.log(event);
 
 
 
@@ -254,7 +195,6 @@
                          index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
                          lineindex++;
                      }
- 
  
  
                      for (let y = i; y < sizeincrease + i; y++) {
@@ -278,16 +218,16 @@
                  console.log(doublemap);
  
  */
-                ProgressBarController.start();
-                ProgressBarController.progressVisible(false);
-                ProgressBarController.setMessage("Getting data")
+                Progressbar.start();
+                Progressbar.visible = false;
+                Progressbar.message = "Getting data";
 
                 setTimeout(function () {
                     let heightmap = terrain.getHeightValues();
 
                     //  var myworker = new Worker('./scripts/webworker.js');
                     var myworker = new Worker(URL.createObjectURL(new Blob(["(" + worker_function.toString() + ")()"], { type: 'text/javascript' })));
-                    ProgressBarController.setMessage("Setup data")
+                    Progressbar.message = "Setting up data"
                     myworker.postMessage([heightmap, terrain.mapSize]);
 
                     myworker.onmessage = function (e) {
@@ -295,34 +235,29 @@
 
                         switch (e.data[0]) {
                             case "Start":
-                                ProgressBarController.progressVisible(true);
-                                ProgressBarController.setMessage(e.data[1])
+                                Progressbar.visible = true;
+                                Progressbar.message = e.data[1]
                                 break;
                             case "Progress":
-                                ProgressBarController.setMessage(e.data[1] + ": " + e.data[2] + "%");
-                                ProgressBarController.setProgress(e.data[2]);
+                                Progressbar.message = e.data[1] + ": " + e.data[2] + "%";
+                                Progressbar.progress = e.data[2];
                                 break;
                             case "Finished":
-                                ProgressBarController.setMessage(e.data[1]);
+                                Progressbar.message = e.data[1];
+                                Progressbar.progress = 100;
                                 break;
                             case "Data":
                                 document.getElementById('png').src = makepngfile(e.data[1]);
-                                ProgressBarController.stop();
+                                Progressbar.stop();
                                 break;
                         }
                     }
 
                 }, 5);
 
-
-
-
                 //var link = document.getElementById('downloadlink');
                 //link.href = makepngfile(pngdata);
                 //link.click();
-
-
-
             })
 
 
@@ -341,15 +276,7 @@
 
                 return pngfile;
             };
-
-
-
         }
-
-
-
-
-
     </script>
 
 
