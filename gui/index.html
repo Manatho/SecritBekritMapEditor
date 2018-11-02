@@ -6,8 +6,6 @@
     <title>MapEditor</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-
 </head>
 
 <body oncontextmenu="return false;" style="margin: 0; padding: 0">
@@ -24,6 +22,9 @@
     <script src="scripts/tool-effect-visualiser.js"></script>
 
     <script src="scripts/webworker.js"></script>
+
+    <!-- GUI ELEMENTS -->
+    <script src="module/progressbar/Progressbar.js"></script>
 
     <div class="toolbar">
         <img id="png" width="70" height="70" style="image-rendering: pixelated">
@@ -55,13 +56,11 @@
             <img draggable="false" class="toolbar-icon" src="style/icons/export.png">
         </div>
         <a download="heightmap.png" id="downloadlink" style="display: none"></a>
-
     </div>
+
 
     <script>
         {
-
-
 
             //Tool buttons:
             let toolbuttons = document.getElementsByName('toolbutton')
@@ -177,14 +176,13 @@
             let exportButton = document.getElementById("export");
 
             exportButton.addEventListener("click", (event) => {
-                console.log(event);
+            console.log(event);
 
 
 
                 //console.log("-....................................");
 
-                console.log("Task: 0");
-                let heightmap = terrain.getHeightValues();
+
                 /* let doublemap = [];
  
                  let index = 0;
@@ -197,7 +195,6 @@
                          index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
                          lineindex++;
                      }
- 
  
  
                      for (let y = i; y < sizeincrease + i; y++) {
@@ -221,40 +218,46 @@
                  console.log(doublemap);
  
  */
-                console.log("Task: 1");
-              //  var myworker = new Worker('./scripts/webworker.js');
-              var myworker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
-                myworker.postMessage([heightmap, terrain.mapSize]);
+                Progressbar.start();
+                Progressbar.visible = false;
+                Progressbar.message = "Getting data";
 
-                myworker.onmessage = function (e) {
-                    //console.log(e);
-                    
-                    if(e.data[0] == 0){
-                        console.log(e.data[1]);
-                        
-                    } else {
-                        document.getElementById('png').src = makepngfile(e.data[1]);
+                setTimeout(function () {
+                    let heightmap = terrain.getHeightValues();
+
+                    //  var myworker = new Worker('./scripts/webworker.js');
+                    var myworker = new Worker(URL.createObjectURL(new Blob(["(" + worker_function.toString() + ")()"], { type: 'text/javascript' })));
+                    Progressbar.message = "Setting up data"
+                    myworker.postMessage([heightmap, terrain.mapSize]);
+
+                    myworker.onmessage = function (e) {
+                        //console.log(e);
+
+                        switch (e.data[0]) {
+                            case "Start":
+                                Progressbar.visible = true;
+                                Progressbar.message = e.data[1]
+                                break;
+                            case "Progress":
+                                Progressbar.message = e.data[1] + ": " + e.data[2] + "%";
+                                Progressbar.progress = e.data[2];
+                                break;
+                            case "Finished":
+                                Progressbar.message = e.data[1];
+                                Progressbar.progress = 100;
+                                break;
+                            case "Data":
+                                document.getElementById('png').src = makepngfile(e.data[1]);
+                                Progressbar.stop();
+                                break;
+                        }
                     }
-                   // result.textContent = e.data;
-                   
-                }
 
-                /*let pngdata = PNG160.createPNG(terrain.mapSize + 1, terrain.mapSize + 1 , (w, h, i) => {
-                    if(i % 100000 == 0){
-                        console.log("Progress:", (i / ((terrain.mapSize + 1) * (terrain.mapSize + 1))*100) + "%",);
-                    }
-                    return lerp(heightmap[i], max, min, 0, 65535);
-                })*/
-
-
-
+                }, 5);
 
                 //var link = document.getElementById('downloadlink');
                 //link.href = makepngfile(pngdata);
                 //link.click();
-
-                
-
             })
 
 
@@ -273,15 +276,7 @@
 
                 return pngfile;
             };
-
-
-
         }
-
-
-
-
-
     </script>
 
 
