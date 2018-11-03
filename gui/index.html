@@ -63,7 +63,6 @@
 
     <script>
         {
-
             //Tool buttons:
             let toolbuttons = document.getElementsByName('toolbutton')
             toolbuttons.forEach(button => {
@@ -178,7 +177,9 @@
 
             var multiplier = 1
             var sigma = 1.5;
-            var tester = 0;
+            var max = 390;
+            var min = -1110;
+
             exportButton.addEventListener("click", (event) => {
                 console.log(event);
 
@@ -221,29 +222,21 @@
 
                 }, 5);
 
-                //var link = document.getElementById('downloadlink');
-                //link.href = makepngfile(pngdata);
-                //link.click();
             })
 
             var pngfile = null;
             let makepngfile = function (image) {
                 var data = new Blob([image], { type: 'image/png' });
 
-                // If we are replacing a previously generated file we need to
-                // manually revoke the object URL to avoid memory leaks.
                 if (pngfile !== null) {
                     window.URL.revokeObjectURL(pngfile);
                 }
-
                 pngfile = window.URL.createObjectURL(data);
-
                 return pngfile;
             };
 
             const lerp = (num, in_min, in_max, out_min, out_max) => {
                 lerped = (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-
                 if (lerped < out_min || lerped > out_max) {
                     return Math.max(Math.min(lerped, out_max), out_min)
                 }
@@ -252,11 +245,10 @@
 
             function mapMultiplier(heightmap, terrainwidth, multiplier) {
                 let linesize = (terrainwidth) * multiplier + multiplier
-                console.log(terrainwidth + 1);
                 let multipliedMap = new Array(linesize * linesize);
+                let imagesize = linesize - multiplier + 1
                 terrainwidth++;
-                var max = 390;
-                var min = -1110;
+
                 let index = 0;
                 heightmap.forEach((h, i) => {
                     let value = h;
@@ -273,11 +265,9 @@
                             }
                         }
                     }
-
                     index += multiplier;
                 });
-
-                let imagesize = linesize - multiplier + 1
+                
                 multipliedMap = multipliedMap.filter((h, i) => h != null);
                 multipliedMap = multipliedMap.slice(0, multipliedMap.length - imagesize * (multiplier - 1))
 

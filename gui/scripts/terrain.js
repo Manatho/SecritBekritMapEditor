@@ -1,11 +1,11 @@
 class Terrain {
     constructor() {
-        //this.mapSize = 4096;  this.indiceWorlSize = 10000;  var indiceSize = 128;
-        this.mapSize = 2048;  this.indiceWorlSize = 5000;  var indiceSize = 128;
-        //this.mapSize = 1024;  this.indiceWorlSize = 5000;  var indiceSize = 128;
-        //this.mapSize = 4;
-        //this.indiceWorlSize = 1000;
-        //var indiceSize = 2;
+        //this.mapSize = 4096;  this.indiceWorlSize = 8000;  var indiceSize = 128;
+        //this.mapSize = 2048; this.indiceWorlSize = 4000; var indiceSize = 128;
+        this.mapSize = 1024;  this.indiceWorlSize = 2000;  var indiceSize = 128;
+        //this.mapSize = 512;  this.indiceWorlSize = 1000;  var indiceSize = 64;
+        //this.mapSize = 256;  this.indiceWorlSize = 500;  var indiceSize = 32;
+        //this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
 
         let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
         let planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.BackSide });
@@ -85,10 +85,10 @@ class Terrain {
     }
 
     getHeightValues() {
-        let height = new Array((this.mapSize+1)*(this.mapSize+1));
+        let height = new Array((this.mapSize + 1) * (this.mapSize + 1));
         let indice = this._indiceSize - 1;
         this._meshes.forEach(mesh => {
-            
+
             for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
                 let vertex = getVertex(mesh.geometry, i);
                 let pos = mesh.position.clone();
@@ -100,7 +100,7 @@ class Terrain {
 
                 pos.x = Math.round(pos.x)
                 pos.z = Math.round(pos.z)
-                height[pos.z + pos.x * (this.mapSize + 1)] =  vertex.z
+                height[pos.z + pos.x * (this.mapSize + 1)] = vertex.z
             }
         });
 

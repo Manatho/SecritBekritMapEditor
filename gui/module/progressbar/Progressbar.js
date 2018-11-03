@@ -37,20 +37,20 @@
             message.innerHTML = m;
         }
 
-        get message(){
+        get message() {
             return message.innerHTML;
         }
 
-        set progress(p){
+        set progress(p) {
             progressbar.style.display = "block";
             progressbar.style.width = p + "%";
         }
 
-        get progress(){
+        get progress() {
             return progressbar.style.width;
         }
 
-        set visible(bool){
+        set visible(bool) {
             if (!bool) {
                 progressbar.style.display = "none";
             } else {
