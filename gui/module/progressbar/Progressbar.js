@@ -18,18 +18,12 @@
     //CSS
     let css = `\t<link rel="stylesheet" href="module/progressbar/taskmodal.css"></link>`
     document.getElementsByTagName('head')[0].innerHTML += css;
-    
-    
 
     let modal = document.getElementById("loadingmodal");
     let progressbar = document.getElementById("progressbar");
     let message = document.getElementById("message");
 
     class ProgressBarController {
-        constructor(){
-
-        }
-
         start() {
             modal.style.display = "block";
             progressbar.style.width = 0 + "%";
@@ -65,7 +59,6 @@
         }
     }
 
-    
 
     var Progressbar = new ProgressBarController();
 

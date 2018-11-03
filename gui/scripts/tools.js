@@ -28,7 +28,7 @@ class Tool {
             tool.iterateBrush((x, y, strength) => {
                 if (toolableVertices[y] && toolableVertices[y][x]) {
                     if (invert) {
-                        toolableVertices[y][x].height(strength * tool.strength);
+                        toolableVertices[y][x].height += strength * tool.strength;
                     } else {
                         toolableVertices[y][x].height -= (strength * tool.strength);
                     }
