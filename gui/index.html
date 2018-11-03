@@ -23,6 +23,8 @@
 
     <script src="scripts/webworker.js"></script>
 
+    <script src="scripts/gaussianblur.js"></script>
+
     <!-- GUI ELEMENTS -->
     <script src="module/progressbar/Progressbar.js"></script>
 
@@ -172,52 +174,14 @@
             })
 
             //Export button
-            var sizeincrease = 4;
             let exportButton = document.getElementById("export");
 
+            var multiplier = 1
+            var sigma = 1.5;
+            var tester = 0;
             exportButton.addEventListener("click", (event) => {
-            console.log(event);
+                console.log(event);
 
-
-
-                //console.log("-....................................");
-
-
-                /* let doublemap = [];
- 
-                 let index = 0;
-                 let indexoff = 0;
-                 
-                 let lineindex = 0;
-                 heightmap.forEach((h, i) => {
-                     //console.log(i % 4, i);
-                     if (i % (terrain.mapSize + 1) == 0 && i != 0) {
-                         index += (sizeincrease * (sizeincrease - 1) * (terrain.mapSize + 1));
-                         lineindex++;
-                     }
- 
- 
-                     for (let y = i; y < sizeincrease + i; y++) {
-                         for (let w = 0; w < sizeincrease; w++) {
-                             if (lineindex / terrain.mapSize == 1 && w + 1 == sizeincrease) {
-                             } else if (i % terrain.mapSize + 1 == terrain.mapSize && y + 1 == sizeincrease + i) {
-                                 //doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1))- indexoff] = 50
-                             }
-                             else {
-                                 doublemap[index + y + ((w * sizeincrease) * (terrain.mapSize + 1)) - indexoff] = h
-                             }
- 
-                         }
-                     }
-                     index += sizeincrease - 1;
-                 });
-                 heightmap = [];
- 
-                 doublemap = doublemap.filter(i => i != null);
-                 console.log(heightmap);
-                 console.log(doublemap);
- 
- */
                 Progressbar.start();
                 Progressbar.visible = false;
                 Progressbar.message = "Getting data";
@@ -225,10 +189,12 @@
                 setTimeout(function () {
                     let heightmap = terrain.getHeightValues();
 
+                    heightmap = mapMultiplier(heightmap, terrain.mapSize, multiplier);
+
                     //  var myworker = new Worker('./scripts/webworker.js');
                     var myworker = new Worker(URL.createObjectURL(new Blob(["(" + worker_function.toString() + ")()"], { type: 'text/javascript' })));
                     Progressbar.message = "Setting up data"
-                    myworker.postMessage([heightmap, terrain.mapSize]);
+                    myworker.postMessage([heightmap, terrain.mapSize * multiplier]);
 
                     myworker.onmessage = function (e) {
                         //console.log(e);
@@ -260,8 +226,6 @@
                 //link.click();
             })
 
-
-
             var pngfile = null;
             let makepngfile = function (image) {
                 var data = new Blob([image], { type: 'image/png' });
@@ -276,6 +240,52 @@
 
                 return pngfile;
             };
+
+            const lerp = (num, in_min, in_max, out_min, out_max) => {
+                lerped = (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+
+                if (lerped < out_min || lerped > out_max) {
+                    return Math.max(Math.min(lerped, out_max), out_min)
+                }
+                return lerped;
+            }
+
+            function mapMultiplier(heightmap, terrainwidth, multiplier) {
+                let linesize = (terrainwidth) * multiplier + multiplier
+                console.log(terrainwidth + 1);
+                let multipliedMap = new Array(linesize * linesize);
+                terrainwidth++;
+                var max = 390;
+                var min = -1110;
+                let index = 0;
+                heightmap.forEach((h, i) => {
+                    let value = h;
+                    if (i % terrainwidth == 0 && i != 0) {
+                        index += linesize * (multiplier - 1)
+                    }
+
+                    for (let x = 0; x < multiplier; x++) {
+                        for (let y = 0; y < multiplier; y++) {
+                            if ((i + 1) % terrainwidth != 0 || x == 0) {
+                                multipliedMap[(index + x) + (linesize * y)] = lerp(value, max, min, 0, 65535);;
+                            } else {
+                                multipliedMap[(index + x) + (linesize * y)] = null;
+                            }
+                        }
+                    }
+
+                    index += multiplier;
+                });
+
+                let imagesize = linesize - multiplier + 1
+                multipliedMap = multipliedMap.filter((h, i) => h != null);
+                multipliedMap = multipliedMap.slice(0, multipliedMap.length - imagesize * (multiplier - 1))
+
+                if (sigma > 0 && multiplier > 1) {
+                    gaussBlur_4(multipliedMap, new Array(multipliedMap.length), imagesize, imagesize, sigma)
+                }
+                return multipliedMap;
+            }
         }
     </script>
 
