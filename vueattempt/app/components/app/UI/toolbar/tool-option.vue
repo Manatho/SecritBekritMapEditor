@@ -14,37 +14,41 @@
 
 <script>
 let mouseEvent;
-let option;
 export default {
 	props: {
 		option: { type: Object }
 	},
 	mounted() {
-		option = this.$props.option;
+		this.minimum = this.$props.option.minimum;
+	},
+	data() {
+		return {
+			minimum: undefined,
+		}
 	},
 	methods: {
-		onEnter: event => {
+		onEnter(event) {
 			event.target.blur();
 		},
-		onLeft: event => {
+		onLeft(event) {
 			event.target.setPointerCapture(1);
 			mouseEvent = event;
 			mouseEvent.strength = event.target.value;
 		},
-		onMove: event => {
+		onMove(event) {
 			if (event.buttons == 1) {
 				let difference = ((mouseEvent.y - event.y) / 10) >> 0;
 				event.target.value = Number.parseInt(mouseEvent.strength) + Number.parseInt(difference);
 			}
 		},
-		onBlur: event => {
-			if (option.minimum != undefined) {
-				event.target.value = Math.max(event.target.value, option.minimum);
+		onBlur(event) {
+			if (this.minimum != undefined) {
+				event.target.value = Math.max(event.target.value, this.minimum);
 			}
 
 			//Tools.tool.strength = strengthInput.value;
 		},
-		onLeftUp: event => {
+		onLeftUp(event) {
 			if (event.target.value != mouseEvent.strength) {
 				event.target.blur();
 			}

@@ -5,6 +5,9 @@
 </template>
 
 <script>
+//import {Progressbar} from "../../progressbar.vue"
+let Progressbar = require("../../progressbar.vue").default.Progressbar;
+
 export default {
 	methods: {
 		exportMap: event => {
@@ -13,13 +16,13 @@ export default {
 			let max = 390;
 			let min = -1110;
 
-			console.log(event);
+			console.log(Progressbar);
 
 			Progressbar.start();
 			Progressbar.visible = false;
 			Progressbar.message = "Getting data";
 
-			/*setTimeout(function() {
+			setTimeout(function() {
 				let heightmap = terrain.getHeightValues();
 
 				heightmap = mapMultiplier(heightmap, terrain.mapSize, multiplier);
@@ -51,7 +54,7 @@ export default {
 							break;
 					}
 				};
-			}, 5);*/
+			}, 5);
 		}
 	}
 };

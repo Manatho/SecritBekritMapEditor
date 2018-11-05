@@ -13,6 +13,9 @@ const Modal = {
 			},
 			setProgress(progress) {
 				Modal.EventBus.$emit("progress", progress);
+			},
+			setMessage(message){
+				Modal.EventBus.$emit("message", message)
 			}
 		};
 	}

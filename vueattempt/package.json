@@ -26,5 +26,9 @@
 		"webpack": "^4.15.1",
 		"webpack-cli": "^3.0.8",
 		"webpack-dev-server": "^3.1.4"
+	},
+	"dependencies": {
+		"@types/vue": "^2.0.0",
+		"npm": "^6.4.1"
 	}
 }
