@@ -3,7 +3,10 @@
 </template>
 
 <script>
-let THREE = require("./lib/threemin.js");
+//Libs and logic
+let THREE = require("../../../libs/threemin.js");
+let Terrain = require("../../logic/terrain.js").Terrain;
+
 let InputController = require("./scripts/input.js").Controller;
 let Camera = require("./scripts/camera.js").Camera;
 
@@ -12,18 +15,21 @@ export default {};
 let scene = new THREE.Scene();
 scene.background = new THREE.Color(0xbab8b4);
 
-let renderer = new THREE.WebGLRenderer({ antialias: false });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
 let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.x = 0;
 scene.add(directionalLight);
 
-var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+let terrain = new Terrain();
+terrain.addToScene(scene);
+
+let renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.insertBefore(renderer.domElement, document.body.firstChild);
+renderer.domElement.className = "Three";
+
+renderer.domElement.addEventListener("mousedown", e => {
+	document.activeElement.blur();
+});
 
 let changed = true;
 function requestRender() {
@@ -41,9 +47,14 @@ function renderloop() {
 
 InputController.init(requestRender);
 Camera.init(InputController);
-
 renderloop();
 </script>
 
-<style>
+<style lang="scss">
+.Three {
+	display: block;
+	position: relative;
+}
 </style>
+
+

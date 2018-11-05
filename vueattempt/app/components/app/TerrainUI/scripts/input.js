@@ -7,7 +7,7 @@ let _actions = {
 	mousewheel: { render: false, methods: [] }
 };
 
-var Controller = {
+let Controller = {
 	isMouseDown: false,
 	mouseDownEvent: {},
 
@@ -19,8 +19,6 @@ var Controller = {
 		}
 	},
 	init: requestRender => {
-		console.log("hej", requestRender);
-
 		Object.keys(_actions).forEach(actionKey => {
 			document.addEventListener(
 				actionKey,

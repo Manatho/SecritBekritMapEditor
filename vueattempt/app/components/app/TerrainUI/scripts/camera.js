@@ -1,4 +1,4 @@
-let THREE = require("../lib/threemin.js");
+let THREE = require("../../../../libs/threemin");
 let InputController = null;
 
 //Camera/view stuff
@@ -14,24 +14,12 @@ let Camera = {
 	ThreeCamera: {},
 	init: inputController => {
 		InputController = inputController;
-		Camera.ThreeCamera = new THREE.PerspectiveCamera(
-			40,
-			window.innerWidth / window.innerHeight,
-			0.1,
-			1000000
-		);
+		Camera.ThreeCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000000);
 		cameraOffset = new THREE.Vector3(0, 0, 0);
 
-		Camera.ThreeCamera.position.x =
-			radius *
-			Math.sin((theta * Math.PI) / 360) *
-			Math.cos((phi * Math.PI) / 360);
-		Camera.ThreeCamera.position.y =
-			radius * Math.sin((phi * Math.PI) / 360);
-		Camera.ThreeCamera.position.z =
-			radius *
-			Math.cos((theta * Math.PI) / 360) *
-			Math.cos((phi * Math.PI) / 360);
+		Camera.ThreeCamera.position.x = radius * Math.sin((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
+		Camera.ThreeCamera.position.y = radius * Math.sin((phi * Math.PI) / 360);
+		Camera.ThreeCamera.position.z = radius * Math.cos((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
 
 		InputController.add("mousewheel", onDocumentMouseWheel, {
 			render: true
@@ -43,18 +31,9 @@ let Camera = {
 		InputController.add("mousedown", onDocumentMouseDown);
 	},
 	update: () => {
-		Camera.ThreeCamera.position.x =
-			radius *
-				Math.sin((theta * Math.PI) / 360) *
-				Math.cos((phi * Math.PI) / 360) +
-			cameraOffset.x;
-		Camera.ThreeCamera.position.y =
-			radius * Math.sin((phi * Math.PI) / 360) + cameraOffset.y;
-		Camera.ThreeCamera.position.z =
-			radius *
-				Math.cos((theta * Math.PI) / 360) *
-				Math.cos((phi * Math.PI) / 360) +
-			cameraOffset.z;
+		Camera.ThreeCamera.position.x = radius * Math.sin((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360) + cameraOffset.x;
+		Camera.ThreeCamera.position.y = radius * Math.sin((phi * Math.PI) / 360) + cameraOffset.y;
+		Camera.ThreeCamera.position.z = radius * Math.cos((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360) + cameraOffset.z;
 		Camera.ThreeCamera.lookAt(cameraOffset);
 	}
 };
@@ -95,13 +74,8 @@ let onDocumentMouseDown = event => {
 let onDocumentMouseMove = event => {
 	event.preventDefault();
 
-	if (
-		InputController.mouseDownEvent.button == 1 &&
-		InputController.isMouseDown
-	) {
-		theta =
-			-((event.clientX - onMouseDownPosition.x) * 0.5) +
-			onMouseDownTheta;
+	if (InputController.mouseDownEvent.button == 1 && InputController.isMouseDown) {
+		theta = -((event.clientX - onMouseDownPosition.x) * 0.5) + onMouseDownTheta;
 		phi = (event.clientY - onMouseDownPosition.y) * 0.5 + onMouseDownPhi;
 		phi = Math.min(179, Math.max(0.1, phi));
 	}
