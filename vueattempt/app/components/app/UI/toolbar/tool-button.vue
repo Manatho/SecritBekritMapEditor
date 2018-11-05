@@ -1,6 +1,6 @@
 <template>
     <label class="toolbar-button-container">
-        <input type="radio" name="toolbutton" value="deincrease" checked="checked" key="1" />
+        <input ref="button" type="radio" name="toolbutton" value="deincrease" checked="checked" key="1" />
         <div class="toolbar-button">
             <img v-bind:src="button.src" draggable="false" class="toolbar-icon">
         </div>
@@ -8,9 +8,19 @@
 </template>
 
 <script>
+let Mousetrap = require("mousetrap");
+
 export default {
 	props: {
 		button: { type: Object }
+	},
+	mounted() {
+		Mousetrap.bind(this.button.key, this.changeTool);
+	},
+	methods: {
+		changeTool() {
+			this.$refs.button.checked = true;
+		}
 	}
 };
 </script>

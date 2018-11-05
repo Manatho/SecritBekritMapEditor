@@ -1,5 +1,6 @@
 <template>
     <div class="toolbar">
+		<img ref="image" width="70" height="70" style="image-rendering: pixelated">
         <template  v-for="tool in tools">
  			<toolbutton
         		v-bind:button="tool"
@@ -7,12 +8,12 @@
         ></toolbutton>
 		<hr class="spacer">
         </template>
-        <template  v-for="option in tooloptions">
+        <template  v-for="(option,index) in tooloptions">
  			<tooloption
         		v-bind:option="option"
         		v-bind:key="option.id"
-        ></tooloption>
-		<hr class="spacer">
+        	></tooloption>
+			<hr class="spacer" v-if="index != tooloptions.length-1">
         </template>
 		<hr>
 		<exportbutton></exportbutton>
@@ -23,6 +24,9 @@
 import toolbutton from "./tool-button.vue";
 import tooloption from "./tool-option.vue";
 import exportbutton from "./export-button.vue";
+import { Controller } from "../../../logic/controller";
+import { ControllerEvents } from "../../../logic/controller";
+let pngfile;
 
 export default {
 	components: {
@@ -30,16 +34,29 @@ export default {
 		tooloption,
 		exportbutton
 	},
+	mounted() {
+		let refs = this.$refs;
+		Controller.subscribe(ControllerEvents.Event_PNG_Data_Changed, function(event) {
+			let data = new Blob([event], { type: "image/png" });
+			if (pngfile !== null) {
+				window.URL.revokeObjectURL(pngfile);
+			}
+			pngfile = window.URL.createObjectURL(data);
+			refs.image.src = pngfile;
+		});
+	},
 	data() {
 		return {
 			tools: [
 				{
 					id: 1,
-					src: require("./images/in-decrease.png")
+					src: require("./images/in-decrease.png"),
+					key: "1"
 				},
 				{
 					id: 2,
-					src: require("./images/average.png")
+					src: require("./images/average.png"),
+					key: "2"
 				}
 			],
 			tooloptions: [
