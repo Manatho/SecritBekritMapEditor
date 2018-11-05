@@ -11,7 +11,7 @@ let Progressbar = require("../../progressbar.vue").default.Progressbar;
 //let terrain = require("../../../logic/controller.js").Controller.Terrain;
 
 import { Controller } from "../../../logic/controller.js";
-import Worker from "worker-loader!./export-logic/pngworker.js";
+import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
 
 let multiplier = 1;
 let sigma = 1.5;
