@@ -2,10 +2,10 @@
 
 <script>
 //Libs and logic
-
 let THREE = require("../../../libs/threemin.js");
 let InputController = require("./scripts/input.js").Controller;
 let Camera = require("./scripts/camera.js").Camera;
+let ToolEffect = require("./scripts/tool-effect-visualiser.js").ToolEffect;
 let terrain = require("../../logic/controller.js").Controller.Terrain;
 console.log(terrain);
 
@@ -43,6 +43,7 @@ function renderloop() {
 
 InputController.init(requestRender);
 Camera.init(InputController);
+ToolEffect.init(scene, InputController, Camera);
 renderloop();
 
 export default {};

@@ -3,9 +3,16 @@ import { Terrain } from "./terrain";
 
 let eventbus = new Vue();
 let terrain = new Terrain();
+let tool = {
+	target: terrain,
+	brush: [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
+};
 let pngdata;
 
 export const Controller = {
+	get Tool() {
+		return tool;
+	},
 	get Terrain() {
 		return terrain;
 	},
