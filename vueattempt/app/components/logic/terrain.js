@@ -258,7 +258,6 @@ class Terrain {
 			//element.verticesNeedUpdate = true;
 			element.normalsNeedUpdate = true;
 		});
-		requestRender();
 	}
 
 	_map2dTo1d(x, y, size) {

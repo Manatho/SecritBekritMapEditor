@@ -19,7 +19,7 @@ export const ToolEffect = {
 			let raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
 
-			let meshesAndVertices = Controller.Tool.target.getAffectedMeshesAndVertices(raycaster, Controller.Tool.brush);
+			let meshesAndVertices = Controller.terrain.getAffectedMeshesAndVertices(raycaster, Controller.Tool.brush);
 			if (!meshesAndVertices) return;
 
 			let vertices = meshesAndVertices.indexedVertices;

@@ -23,10 +23,7 @@ let Controller = {
 			document.addEventListener(
 				actionKey,
 				event => {
-					if (
-						!event.type.includes("mouse") ||
-						event.path[0].nodeName == "CANVAS"
-					) {
+					if (!event.type.includes("mouse") || event.path[0].nodeName == "CANVAS") {
 						_actions[actionKey].methods.forEach(method => {
 							method(event);
 							if (_actions[actionKey].render) {
