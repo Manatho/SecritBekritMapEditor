@@ -1,7 +1,7 @@
 <template>
     <div class="toolbar-number-container">
-            <label for="strength">{{ option.text }}:</label>
-            <input type="number" step="1"  :value="tool.strength" min="0" 
+            <label for="strength">{{ option.name }}:</label>
+            <input ref="input" type="number" step="1"  :value="option.value"
                 @keyup.enter="onEnter"
                 @mousedown.left="onLeft"
                 @mouseup.left="onLeftUp"
@@ -14,14 +14,15 @@
 
 <script>
 import { Controller } from "../../../logic/controller";
+import Vue from "vue";
+
 let mouseEvent;
 export default {
 	props: {
-		option: { type: Object },
-		tool: { type: Object }
+		option: { type: Object }
 	},
 	mounted() {
-		this.minimum = this.$props.option.minimum;
+		this.input = this.$refs.input;
 	},
 	data() {
 		return {
@@ -30,28 +31,26 @@ export default {
 	},
 	methods: {
 		onEnter(event) {
-			event.target.blur();
+			this.input.blur();
 		},
 		onLeft(event) {
-			event.target.setPointerCapture(1);
+			this.input.setPointerCapture(1);
 			mouseEvent = event;
-			mouseEvent.strength = event.target.value;
+			mouseEvent.strength = this.input.value;
 		},
 		onMove(event) {
 			if (event.buttons == 1) {
 				let difference = ((mouseEvent.y - event.y) / 10) >> 0;
-				event.target.value = Number.parseInt(mouseEvent.strength) + Number.parseInt(difference);
+				this.input.value = Number.parseInt(mouseEvent.strength) + Number.parseInt(difference);
 			}
 		},
 		onBlur(event) {
-			if (this.minimum != undefined) {
-				event.target.value = Math.max(event.target.value, this.minimum);
-			}
-			Controller.tool.strength = event.target.value;
+			this.option.value = this.input.value;
+			this.$forceUpdate();
 		},
 		onLeftUp(event) {
-			if (event.target.value != mouseEvent.strength) {
-				event.target.blur();
+			if (this.input.value != mouseEvent.strength) {
+				this.input.blur();
 			}
 		}
 	}

@@ -8,13 +8,12 @@
         ></toolbutton>
 		<hr class="spacer">
         </template>
-        <template  v-for="(option,index) in tooloptions">
+        <template  v-for="(option,index) in Controller.tool.options">
  			<tooloption
-				v-bind:tool="tool"
         		v-bind:option="option"
         		v-bind:key="option.id"
         	></tooloption>
-			<hr class="spacer" v-if="index != tooloptions.length-1">
+			<hr class="spacer" v-if="index != Controller.tool.options.length-1">
         </template>
 		<hr>
 		<exportbutton></exportbutton>
@@ -30,12 +29,13 @@ import { ControllerEvents } from "../../../logic/controller";
 let pngfile;
 
 let tools = [];
+let srcs = [require("./images/in-decrease.png"), require("./images/average.png")];
 
 Controller.tools.forEach((tool, index) => {
 	tools.push({
 		id: index,
-		key: "1",
-		src: require("./images/in-decrease.png"),
+		key: (index + 1).toString(),
+		src: srcs[index],
 		tool: tool
 	});
 });
@@ -59,7 +59,7 @@ export default {
 	},
 	data() {
 		return {
-			tool: Controller.tool,
+			Controller: Controller,
 			tools: tools /*tools[
 				{
 					id: 1,
@@ -71,18 +71,7 @@ export default {
 					src: require("./images/average.png"),
 					key: "2"
 				}
-			],*/,
-			tooloptions: [
-				{
-					id: 3,
-					text: "Strength"
-				},
-				{
-					id: 4,
-					text: "Size",
-					minimum: 1
-				}
-			]
+			],*/
 		};
 	}
 };

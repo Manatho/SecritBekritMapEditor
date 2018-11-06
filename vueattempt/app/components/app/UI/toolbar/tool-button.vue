@@ -1,6 +1,6 @@
 <template>
     <label class="toolbar-button-container">
-        <input ref="button" type="radio" name="toolbutton" value="deincrease" checked="checked" key="1" />
+        <input ref="button" type="radio" name="toolbuttons"  :checked="tooldata.id == 0" @change="changeTool" />
         <div class="toolbar-button">
             <img v-bind:src="tooldata.src" draggable="false" class="toolbar-icon">
         </div>
@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { Controller } from "../../../logic/controller.js";
 let Mousetrap = require("mousetrap");
 
 export default {
@@ -20,6 +21,7 @@ export default {
 	methods: {
 		changeTool() {
 			this.$refs.button.checked = true;
+			Controller.tool = this.tooldata.tool;
 		}
 	}
 };

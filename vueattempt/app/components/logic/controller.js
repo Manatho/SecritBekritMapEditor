@@ -1,11 +1,11 @@
 import Vue from "vue";
 import { Terrain } from "./terrain";
-import { Tool } from "./tools";
+import { raiseTool, averageTool } from "./toolprefabs";
 
 let eventbus = new Vue();
 let terrain = new Terrain();
 
-let tools = [new Tool(10, 5, "square")];
+let tools = [raiseTool, averageTool];
 let tool = tools[0];
 
 let pngdata;
@@ -17,6 +17,9 @@ export const Controller = {
 	},
 	get tool() {
 		return tool;
+	},
+	set tool(newtool) {
+		tool = newtool;
 	},
 	applyTool(raycaster, direction) {
 		tool.applyTool(raycaster, terrain, direction);
