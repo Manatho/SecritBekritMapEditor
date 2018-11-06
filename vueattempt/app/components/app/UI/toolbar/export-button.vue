@@ -5,10 +5,7 @@
 </template>
 
 <script>
-//import {Progressbar} from "../../progressbar.vue"
 let Progressbar = require("../../progressbar.vue").default.Progressbar;
-
-//let terrain = require("../../../logic/controller.js").Controller.Terrain;
 
 import { Controller } from "../../../logic/controller.js";
 import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
@@ -26,9 +23,9 @@ export default {
 			Progressbar.message = "Getting data";
 
 			setTimeout(function() {
-				let heightmap = Controller.Terrain.getHeightValues();
+				let heightmap = Controller.terrain.getHeightValues();
 
-				heightmap = mapMultiplier(heightmap, Controller.Terrain.mapSize, multiplier);
+				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier);
 
 				const worker = new Worker();
 				console.log(worker);
@@ -54,7 +51,7 @@ export default {
 							break;
 					}
 				};
-				worker.postMessage([heightmap, Controller.Terrain.mapSize * multiplier]);
+				worker.postMessage([heightmap, Controller.terrain.mapSize * multiplier]);
 			}, 5);
 		}
 	}

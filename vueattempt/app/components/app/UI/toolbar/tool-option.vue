@@ -1,7 +1,7 @@
 <template>
     <div class="toolbar-number-container">
             <label for="strength">{{ option.text }}:</label>
-            <input type="number" step="1" value="5" min="0" 
+            <input type="number" step="1"  :value="tool.strength" min="0" 
                 @keyup.enter="onEnter"
                 @mousedown.left="onLeft"
                 @mouseup.left="onLeftUp"
@@ -13,18 +13,20 @@
 </template>
 
 <script>
+import { Controller } from "../../../logic/controller";
 let mouseEvent;
 export default {
 	props: {
-		option: { type: Object }
+		option: { type: Object },
+		tool: { type: Object }
 	},
 	mounted() {
 		this.minimum = this.$props.option.minimum;
 	},
 	data() {
 		return {
-			minimum: undefined,
-		}
+			minimum: undefined
+		};
 	},
 	methods: {
 		onEnter(event) {
@@ -45,8 +47,7 @@ export default {
 			if (this.minimum != undefined) {
 				event.target.value = Math.max(event.target.value, this.minimum);
 			}
-
-			//Tools.tool.strength = strengthInput.value;
+			Controller.tool.strength = event.target.value;
 		},
 		onLeftUp(event) {
 			if (event.target.value != mouseEvent.strength) {

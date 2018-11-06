@@ -19,15 +19,15 @@ export const ToolEffect = {
 			let raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
 
-			let meshesAndVertices = Controller.terrain.getAffectedMeshesAndVertices(raycaster, Controller.Tool.brush);
+			let meshesAndVertices = Controller.terrain.getAffectedMeshesAndVertices(raycaster, Controller.tool.brush);
 			if (!meshesAndVertices) return;
 
 			let vertices = meshesAndVertices.indexedVertices;
 
 			//Find brush outline
 			let outline = [];
-			let ymax = Controller.Tool.brush.length - 1;
-			let xmax = Controller.Tool.brush[ymax].length - 1;
+			let ymax = Controller.tool.brush.length - 1;
+			let xmax = Controller.tool.brush[ymax].length - 1;
 
 			//TODO: find ways to clean the following up:
 			//Scans from each of the four sides in turn to
@@ -58,7 +58,7 @@ export const ToolEffect = {
 			if (outline[0]) outline.push(outline[0]);
 
 			function addVertex(x, y) {
-				if (Controller.Tool.brush[y][x] > 0 && vertices[y] && vertices[y][x]) {
+				if (Controller.tool.brush[y][x] > 0 && vertices[y] && vertices[y][x]) {
 					outline.push({ x: x, y: y });
 					return true;
 				}

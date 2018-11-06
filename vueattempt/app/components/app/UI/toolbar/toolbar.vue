@@ -3,13 +3,14 @@
 		<img ref="image" width="70" height="70" style="image-rendering: pixelated">
         <template  v-for="tool in tools">
  			<toolbutton
-        		v-bind:button="tool"
+        		v-bind:tooldata="tool"
         		v-bind:key="tool.id"
         ></toolbutton>
 		<hr class="spacer">
         </template>
         <template  v-for="(option,index) in tooloptions">
  			<tooloption
+				v-bind:tool="tool"
         		v-bind:option="option"
         		v-bind:key="option.id"
         	></tooloption>
@@ -27,6 +28,17 @@ import exportbutton from "./export-button.vue";
 import { Controller } from "../../../logic/controller";
 import { ControllerEvents } from "../../../logic/controller";
 let pngfile;
+
+let tools = [];
+
+Controller.tools.forEach((tool, index) => {
+	tools.push({
+		id: index,
+		key: "1",
+		src: require("./images/in-decrease.png"),
+		tool: tool
+	});
+});
 
 export default {
 	components: {
@@ -47,7 +59,8 @@ export default {
 	},
 	data() {
 		return {
-			tools: [
+			tool: Controller.tool,
+			tools: tools /*tools[
 				{
 					id: 1,
 					src: require("./images/in-decrease.png"),
@@ -58,7 +71,7 @@ export default {
 					src: require("./images/average.png"),
 					key: "2"
 				}
-			],
+			],*/,
 			tooloptions: [
 				{
 					id: 3,

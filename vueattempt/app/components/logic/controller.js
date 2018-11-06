@@ -4,12 +4,18 @@ import { Tool } from "./tools";
 
 let eventbus = new Vue();
 let terrain = new Terrain();
-let tool = new Tool(5, 5, "square");
+
+let tools = [new Tool(10, 5, "square")];
+let tool = tools[0];
+
 let pngdata;
 let render = true;
 
 export const Controller = {
-	get Tool() {
+	get tools() {
+		return tools;
+	},
+	get tool() {
 		return tool;
 	},
 	applyTool(raycaster, direction) {
