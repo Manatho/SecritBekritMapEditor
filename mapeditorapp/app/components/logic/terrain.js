@@ -1,12 +1,12 @@
 let THREE = require("../../libs/threemin.js");
 
 class Terrain {
-	constructor() {
+	constructor(mapsize, indicesize, indiceworldsize) {
 		//this.mapSize = 4096;  this.indiceWorlSize = 8000;  var indiceSize = 128;
-		//this.mapSize = 2048; this.indiceWorlSize = 4000; var indiceSize = 128;
-		this.mapSize = 1024;
-		this.indiceWorlSize = 2000;
-		let indiceSize = 128;
+		this.mapSize = mapsize;
+		this.indiceWorlSize = indicesize;
+		var indiceSize = indiceworldsize;
+		//this.mapSize = 1024;this.indiceWorlSize = 2000;let indiceSize = 128;
 		//this.mapSize = 512;  this.indiceWorlSize = 1000;  var indiceSize = 64;
 		//this.mapSize = 256;  this.indiceWorlSize = 500;  var indiceSize = 32;
 		//this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
@@ -90,6 +90,26 @@ class Terrain {
 
 		this._grid.forEach(grid => {
 			scene.add(grid);
+		});
+	}
+
+	removeFromScene(scene) {
+		this._meshes.forEach(mesh => {
+			scene.remove(mesh);
+			mesh.geometry.dispose();
+			mesh.geometry = null;
+			mesh.material.dispose();
+			mesh.material = null;
+			mesh = null;
+		});
+
+		this._grid.forEach(grid => {
+			scene.remove(grid);
+			grid.geometry.dispose();
+			grid.geometry = null;
+			grid.material.dispose();
+			grid.material = null;
+			grid = null;
 		});
 	}
 

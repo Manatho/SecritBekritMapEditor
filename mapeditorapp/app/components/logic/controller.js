@@ -3,7 +3,7 @@ import { Terrain } from "./terrain";
 import { raiseTool, averageTool } from "./toolprefabs";
 
 let eventbus = new Vue();
-let terrain = new Terrain();
+let terrain;
 
 let tools = [raiseTool, averageTool];
 let tool = tools[0];
@@ -28,12 +28,24 @@ export const Controller = {
 	get terrain() {
 		return terrain;
 	},
+	createNewTerrain() {
+		// this.mapSize = 4096; this.indiceWorlSize = 8000; var indiceSize = 128;
+		// this.mapSize = 2048; this.indiceWorlSize = 4000; var indiceSize = 128;
+		// this.mapSize = 1024; this.indiceWorlSize = 2000; let indiceSize = 128;
+		// this.mapSize = 512; this.indiceWorlSize = 1000; var indiceSize = 64;
+		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
+		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
+
+		terrain = new Terrain(1024, 2000, 128);
+		//terrain = new Terrain(512, 1000, 64);
+		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
+	},
 	get pngData() {
 		return pngdata;
 	},
 	set pngData(data) {
 		pngdata = data;
-		eventbus.$emit("png-data-changed", pngdata);
+		eventbus.$emit(ControllerEvents.Event_PNG_Data_Changed, pngdata);
 	},
 	requestRender() {
 		render = true;
@@ -45,6 +57,8 @@ export const Controller = {
 	},
 
 	subscribe(eventType, method) {
+		console.log(eventType);
+
 		eventbus.$on(eventType, method);
 	},
 	unsubscribe(eventType, method) {
@@ -53,5 +67,6 @@ export const Controller = {
 };
 
 export const ControllerEvents = {
-	Event_PNG_Data_Changed: "png-data-changed"
+	Event_PNG_Data_Changed: "png-data-changed",
+	Event_Terrain_Changed: "terrain-changed"
 };

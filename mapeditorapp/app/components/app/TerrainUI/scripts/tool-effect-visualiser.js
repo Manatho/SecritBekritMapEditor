@@ -14,6 +14,10 @@ export const ToolEffect = {
 		scene.add(tooloutline);
 
 		InputController.add("mousemove", event => {
+			if (Controller.terrain == null) {
+				return;
+			}
+
 			//Find vertices
 			let mouse3D = new THREE.Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
 			let raycaster = new THREE.Raycaster();

@@ -80,6 +80,9 @@ export class Tool {
 	}
 
 	applyTool(raycaster, terrain, direction) {
+		if (terrain == null) {
+			return;
+		}
 		let MeshesVertices;
 		if (direction != 1) {
 			MeshesVertices = terrain.getAffectedMeshesAndVertices(raycaster, this.brush);

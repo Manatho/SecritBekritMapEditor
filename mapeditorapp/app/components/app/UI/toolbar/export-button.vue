@@ -18,6 +18,10 @@ let min = -1110;
 export default {
 	methods: {
 		exportMap: event => {
+			if (Controller.terrain == null) {
+				return;
+			}
+
 			Progressbar.start();
 			Progressbar.visible = false;
 			Progressbar.message = "Getting data";
@@ -28,7 +32,6 @@ export default {
 				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier);
 
 				const worker = new Worker();
-				console.log(worker);
 
 				Progressbar.message = "Setting up data";
 				worker.onmessage = function(e) {

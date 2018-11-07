@@ -18,6 +18,12 @@ let Controller = {
 			_actions[actionType].render = opts.render;
 		}
 	},
+	remove(actionType, action) {
+		let index = _actions[actionType].methods.indexOf(action);
+		if (index > -1) {
+			_actions[actionType].methods.splice(index, 1);
+		}
+	},
 	init: requestRender => {
 		Object.keys(_actions).forEach(actionKey => {
 			document.addEventListener(
