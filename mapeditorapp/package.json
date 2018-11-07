@@ -1,0 +1,37 @@
+{
+	"name": "mapeditorapp",
+	"version": "1.0.0",
+	"description": "",
+	"private": true,
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "webpack",
+		"start": "webpack-dev-server --hotOnly"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"clean-webpack-plugin": "^0.1.19",
+		"css-loader": "^0.28.11",
+		"file-loader": "^2.0.0",
+		"html-webpack-plugin": "^3.2.0",
+		"mousetrap": "^1.6.2",
+		"node-sass": "^4.9.1",
+		"pako": "^1.0.6",
+		"sass-loader": "^7.0.3",
+		"style-loader": "^0.21.0",
+		"url-loader": "^1.1.2",
+		"vue": "^2.5.16",
+		"vue-loader": "^15.2.4",
+		"vue-template-compiler": "^2.5.16",
+		"webpack": "^4.15.1",
+		"webpack-cli": "^3.0.8",
+		"webpack-dev-server": "^3.1.4",
+		"worker-loader": "^2.0.0"
+	},
+	"dependencies": {
+		"@types/vue": "^2.0.0",
+		"npm": "^6.4.1"
+	}
+}
