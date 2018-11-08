@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar">
-		<img ref="image" width="70" height="70" style="image-rendering: pixelated">
+		<img ref="image" width="70" height="70" style="image-rendering: pixelated;">
         <template  v-for="tool in tools">
  			<toolbutton
         		v-bind:tooldata="tool"
@@ -60,41 +60,32 @@ export default {
 	data() {
 		return {
 			Controller: Controller,
-			tools: tools /*tools[
-				{
-					id: 1,
-					src: require("./images/in-decrease.png"),
-					key: "1"
-				},
-				{
-					id: 2,
-					src: require("./images/average.png"),
-					key: "2"
-				}
-			],*/
+			tools: tools
 		};
 	}
 };
 </script>
 
 <style lang="scss" scoped>
+@import "./../../../../style/variables.scss";
 .toolbar {
 	position: absolute;
-	top: 5%;
-	width: 70px;
+	top: $menubar-height;
+	width: $toolbar-width;
 	left: 0;
 
 	padding-top: 10px;
 	padding-bottom: 10px;
 	margin: 0px;
 
-	background-color: rgb(153, 147, 143);
+	background-color: $element-background;
 
-	border: 1px solid rgb(59, 59, 59);
+	border: 1px solid $element-background-border;
 	border-left: 0;
+	border-top: 0;
 
-	border-top-right-radius: 10px;
-	border-bottom-right-radius: 10px;
+	border-bottom-right-radius: 5px;
+	user-select: none;
 }
 
 .spacer {

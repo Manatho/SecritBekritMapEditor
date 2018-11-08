@@ -1,5 +1,6 @@
 <template>
     <div>
+		<Menubar></Menubar>
         <Toolbar></Toolbar>
         <Editor></Editor>
 		<Progressbar></Progressbar>
@@ -7,6 +8,7 @@
 </template>
 
 <script>
+import Menubar from "./UI/menubar/menubar.vue";
 import Toolbar from "./UI/toolbar/toolbar.vue";
 import Progressbar from "./progressbar.vue";
 import Editor from "./TerrainUI/editor.vue";
@@ -16,7 +18,8 @@ export default {
 	components: {
 		Toolbar,
 		Editor,
-		Progressbar
+		Progressbar,
+		Menubar
 	}
 };
 </script>

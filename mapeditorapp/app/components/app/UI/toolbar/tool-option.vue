@@ -1,6 +1,6 @@
 <template>
     <div class="toolbar-number-container">
-            <label for="strength">{{ option.name }}:</label>
+            <label>{{option.name.charAt(0).toUpperCase() + option.name.slice(1) }}:</label>
             <input ref="input" type="number" step="1"  :value="option.value"
                 @keyup.enter="onEnter"
                 @mousedown.left="onLeft"
@@ -58,13 +58,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "./../../../../style/variables.scss";
 .toolbar-number-container {
-	font-family: "Courier New", Courier, monospace;
+	font-family: $font;
+	//font-weight: bold;
 	font-size: 13px;
 }
 
 .toolbar-number-container > input[type="number"] {
-	font-family: "Courier New", Courier, monospace;
+	font-family: $font;
 	font-size: 13px;
 	margin: auto;
 	width: 55px;
