@@ -1,8 +1,9 @@
 <template>
     <div>
-		<Menubar></Menubar>
+		<Menubar v-bind:menuElements="menuElements"></Menubar>
         <Toolbar></Toolbar>
         <Editor></Editor>
+		<NewTerrain ref="child"></NewTerrain>
 		<Progressbar></Progressbar>
     </div>
 </template>
@@ -12,6 +13,7 @@ import Menubar from "./UI/menubar/menubar.vue";
 import Toolbar from "./UI/toolbar/toolbar.vue";
 import Progressbar from "./progressbar.vue";
 import Editor from "./TerrainUI/editor.vue";
+import NewTerrain from "./new-terrain-modal.vue";
 
 export default {
 	name: "app",
@@ -19,7 +21,18 @@ export default {
 		Toolbar,
 		Editor,
 		Progressbar,
-		Menubar
+		Menubar,
+		NewTerrain
+	},
+	data() {
+		return {
+			menuElements: [
+				{
+					header: "File",
+					items: [{ text: "New Map", action: () => this.$refs.child.show() }]
+				}
+			]
+		};
 	}
 };
 </script>

@@ -1,9 +1,9 @@
 <template>
 <div class="menubar">
-    <div class="menu-entry">
-        <button @click ="onclick" @blur="onblur" class="menu-header">File</button>
+    <div class="menu-entry" v-for="menuElement in menuElements">
+        <button @click ="onclick" @blur="onblur" class="menu-header">{{menuElement.header}}</button>
         <div v-show="show" class="menu-items">
-            <a href="">New Map</a>
+            <a v-for="item in menuElement.items" @click="item.action">{{item.text}}</a>
         </div>
     </div>
 
@@ -12,12 +12,15 @@
 
 <script>
 export default {
+	props: {
+		menuElements: { type: Array }
+	},
 	methods: {
 		onclick(event) {
 			this.show = !this.show;
 		},
 		onblur(event) {
-			this.show = false;
+			setTimeout(() => (this.show = false), 100);
 		}
 	},
 	data() {
@@ -85,6 +88,7 @@ export default {
 	color: black;
 	text-decoration: none;
 	padding: 2px 10px;
+	cursor: default;
 }
 
 .menu-items a:hover {

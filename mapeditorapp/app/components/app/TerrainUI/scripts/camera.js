@@ -40,7 +40,7 @@ let Camera = {
 
 let onDocumentMouseWheel = event => {
 	event.preventDefault();
-	radius -= event.wheelDeltaY * 10;
+	radius -= event.wheelDeltaY;
 
 	radius = Math.max(radius, 10);
 };

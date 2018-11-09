@@ -28,7 +28,16 @@ export const Controller = {
 	get terrain() {
 		return terrain;
 	},
-	createNewTerrain() {
+	createNewTerrain(size, scale) {
+		let actualSize = size / scale;
+		let indeiceSize = Math.min(actualSize, 128);
+		let indiceCount = actualSize / indeiceSize;
+
+		// 128 1024 -> 8
+		// 128 512 -> 4
+		// 128 256 -> 2
+		// 128 128 -> 1
+
 		// this.mapSize = 4096; this.indiceWorlSize = 8000; var indiceSize = 128;
 		// this.mapSize = 2048; this.indiceWorlSize = 4000; var indiceSize = 128;
 		// this.mapSize = 1024; this.indiceWorlSize = 2000; let indiceSize = 128;
@@ -36,9 +45,10 @@ export const Controller = {
 		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
 		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
 
-		terrain = new Terrain(1024, 2000, 128);
+		terrain = new Terrain(actualSize, (size * 16) / (actualSize / indeiceSize), indeiceSize);
 		//terrain = new Terrain(512, 1000, 64);
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
+		this.requestRender();
 	},
 	get pngData() {
 		return pngdata;
