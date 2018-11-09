@@ -1,79 +1,94 @@
 <template>
-    <div class="menubar">
-        <div class="menubar-deadspace"></div>
-		<div class="menubar-items">
-			<div class="menu-item">File</div>
-		</div>
+<div class="menubar">
+    <div class="menu-entry">
+        <button @click ="onclick" @blur="onblur" class="menu-header">File</button>
+        <div v-show="show" class="menu-items">
+            <a href="">New Map</a>
+        </div>
     </div>
+
+</div>
 </template>
 
 <script>
-export default {};
+export default {
+	methods: {
+		onclick(event) {
+			this.show = !this.show;
+		},
+		onblur(event) {
+			this.show = false;
+		}
+	},
+	data() {
+		return {
+			show: false
+		};
+	}
+};
 </script>
 
 <style lang="scss" scoped>
 @import "./../../../../style/variables.scss";
+
 .menubar {
-	// background-color: $element-background;
-
-	// border: solid 1px $element-background-borderlight;
-
-	// box-shadow: $toolbar-width 1px 0 0 $element-background-border;
-
-	// width: $toolbar-width;
-	// height: $menubar-height;
-
 	top: 0px;
 	left: 0px;
 	position: absolute;
-	//z-index: 1;
 	height: $menubar-height;
-}
 
-// .menubar-deadspace {
-// 	height: 100%;
-// 	width: $toolbar-width + 1;
-// 	background-color: $element-background;
-// 	float: left;
-// }
-
-.menubar-items {
-	height: 100%;
-	//width: 20px;
 	background-color: $element-background;
-	float: left;
+	border: $element-border;
+	border-width: 0 1px 1px 0;
 	border-bottom-right-radius: 5px;
-
-	border: 1px solid $element-background-border;
-	border-left: 0;
-	border-top: 0;
+	font-family: $font;
 	padding-right: 10px;
-	padding-left: 1px;
 }
 
-.menu-item {
-	font-family: $font;
-	//font-weight: bold;
-	font-size: 18px;
-	//color: $element-background-border;
-	padding-left: 20px;
-	padding-right: 20px;
-	border-left: 1px solid transparent;
-	border-right: 1px solid transparent;
-
+.menu-entry {
+	position: relative;
+	display: inline-block;
 	height: 100%;
-	line-height: 170%;
+}
+
+.menu-header {
+	font-family: $font;
+	font-size: 16px;
+	padding: 0 20px 0 20px;
+	display: block;
 	text-align: center;
 	background-color: $element-background;
-	float: left;
-	user-select: none;
+	height: 100%;
+	border: none;
+}
 
-	&:hover {
-		background-color: $element-hoverlight;
+.menu-header:hover,
+.menu-header:focus {
+	background-color: $element-hoverlight;
+	outline: none;
+}
 
-		border-left-color: $element-background-borderlight;
-		border-right-color: $element-background-borderlight;
-	}
+.menu-items {
+	position: absolute;
+	z-index: 1;
+	min-width: 160px;
+
+	background-color: $element-backgroundlight;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.8);
+}
+
+.menu-items a {
+	display: block;
+	height: $menubar-height;
+	font-size: 13px;
+	line-height: 225%;
+	color: black;
+	text-decoration: none;
+	padding: 2px 10px;
+}
+
+.menu-items a:hover {
+	background-color: $element-hoverhuedlight;
 }
 </style>
 

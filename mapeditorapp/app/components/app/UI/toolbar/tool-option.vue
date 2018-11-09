@@ -74,7 +74,7 @@ export default {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 	border: 1px solid rgb(59, 59, 59);
-	background-color: rgb(236, 229, 223);
+	background-color: $element-backgroundlight;
 }
 
 .toolbar-number-container > input[type="number"]:focus {
