@@ -8,9 +8,9 @@
 let Progressbar = require("../../progressbar.vue").default.Progressbar;
 
 import { Controller } from "../../../logic/controller.js";
+import { gaussBlur } from "./export-logic/gaussianblur.js";
 import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
 
-let multiplier = 1;
 let sigma = 1.5;
 let max = 390;
 let min = -1110;
@@ -28,7 +28,7 @@ export default {
 
 			setTimeout(function() {
 				let heightmap = Controller.terrain.getHeightValues();
-
+				let multiplier = Controller.scaling;
 				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier);
 
 				const worker = new Worker();
@@ -59,26 +59,6 @@ export default {
 		}
 	}
 };
-
-function createPNG() {
-	onmessage = function(e) {
-		postMessage(["Start", "Starting"]);
-
-		let onepercent = (((e.data[1] + 1) * (e.data[1] + 1)) / 100) >> 0;
-		let pngdata = PNG160.createPNG(e.data[1] + 1, e.data[1] + 1, (w, h, i) => {
-			if (i % onepercent == 0) {
-				if (i / onepercent == 100) {
-					postMessage(["Finished", "Finishing..."]);
-				} else {
-					postMessage(["Progress", "Progress", i / onepercent]);
-				}
-			}
-			return e.data[0][i];
-		});
-		postMessage(["Finished", "Finished"]);
-		postMessage(["Data", pngdata]);
-	};
-}
 
 function lerp(num, in_min, in_max, out_min, out_max) {
 	let lerped = ((num - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
@@ -117,7 +97,7 @@ function mapMultiplier(heightmap, terrainwidth, multiplier) {
 	multipliedMap = multipliedMap.slice(0, multipliedMap.length - imagesize * (multiplier - 1));
 
 	if (sigma > 0 && multiplier > 1) {
-		gaussBlur_4(multipliedMap, new Array(multipliedMap.length), imagesize, imagesize, sigma);
+		gaussBlur(multipliedMap, new Array(multipliedMap.length), imagesize, imagesize, sigma);
 	}
 	return multipliedMap;
 }

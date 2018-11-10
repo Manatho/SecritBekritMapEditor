@@ -3,7 +3,9 @@ import { Terrain } from "./terrain";
 import { raiseTool, averageTool } from "./toolprefabs";
 
 let eventbus = new Vue();
+
 let terrain;
+let scaling = 1;
 
 let tools = [raiseTool, averageTool];
 let tool = tools[0];
@@ -28,6 +30,9 @@ export const Controller = {
 	get terrain() {
 		return terrain;
 	},
+	get scaling() {
+		return scaling;
+	},
 	createNewTerrain(size, scale) {
 		let actualSize = size / scale;
 		let indeiceSize = Math.min(actualSize, 128);
@@ -46,7 +51,8 @@ export const Controller = {
 		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
 
 		terrain = new Terrain(actualSize, (size * 16) / (actualSize / indeiceSize), indeiceSize);
-		//terrain = new Terrain(512, 1000, 64);
+		scaling = scale;
+
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
 		this.requestRender();
 	},
