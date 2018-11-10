@@ -26,7 +26,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new cleanWebPackPlugin(["../docs"]),
+		new cleanWebPackPlugin(["docs"], { root: path.resolve(__dirname, "..") }),
 		new HtmlWebpackPlugin({ title: "App", template: "index.html" }),
 		new webpack.HotModuleReplacementPlugin(),
 		new VueLoaderPlugin()
