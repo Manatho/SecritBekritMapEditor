@@ -8,7 +8,7 @@ module.exports = {
 	entry: "./app/boot.js",
 	output: {
 		filename: "main.js",
-		path: path.resolve(__dirname, "dist"),
+		path: path.resolve(__dirname, "../docs"),
 		globalObject: "this"
 	},
 	mode: "development",
@@ -26,7 +26,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new cleanWebPackPlugin(["dist"]),
+		new cleanWebPackPlugin(["../docs"]),
 		new HtmlWebpackPlugin({ title: "App", template: "index.html" }),
 		new webpack.HotModuleReplacementPlugin(),
 		new VueLoaderPlugin()
