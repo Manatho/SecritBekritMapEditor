@@ -33,10 +33,12 @@ export const Controller = {
 	get scaling() {
 		return scaling;
 	},
-	createNewTerrain(size, scale) {
+	createNewTerrain(size, scale, minheight, maxheight) {
 		let actualSize = size / scale;
 		let indeiceSize = Math.min(actualSize, 128);
 		let indiceCount = actualSize / indeiceSize;
+		let indiceworldsize = ((size / 1024) * 1000) / indiceCount;
+		let baselineheight = 200; //Meters
 
 		// 128 1024 -> 8
 		// 128 512 -> 4
@@ -50,7 +52,7 @@ export const Controller = {
 		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
 		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
 
-		terrain = new Terrain(actualSize, (size * 16) / (actualSize / indeiceSize), indeiceSize);
+		terrain = new Terrain(actualSize, indiceworldsize, indeiceSize, baselineheight, 0, 1000);
 		scaling = scale;
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);

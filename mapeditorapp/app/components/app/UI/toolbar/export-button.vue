@@ -11,9 +11,6 @@ import { Controller } from "../../../logic/controller.js";
 import { gaussBlur } from "./export-logic/gaussianblur.js";
 import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
 
-let max = 390;
-let min = -1110;
-
 export default {
 	methods: {
 		exportMap: event => {
@@ -28,8 +25,15 @@ export default {
 			setTimeout(function() {
 				let heightmap = Controller.terrain.getHeightValues();
 				let multiplier = Controller.scaling;
-				let sigma = multiplier / 2;
-				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier, sigma);
+				let sigma = multiplier / 2 + 0.5;
+				heightmap = mapMultiplier(
+					heightmap,
+					Controller.terrain.min,
+					Controller.terrain.max,
+					Controller.terrain.mapSize,
+					multiplier,
+					sigma
+				);
 
 				const worker = new Worker();
 
@@ -68,7 +72,7 @@ function lerp(num, in_min, in_max, out_min, out_max) {
 	return lerped;
 }
 
-function mapMultiplier(heightmap, terrainwidth, multiplier, sigma) {
+function mapMultiplier(heightmap, min, max, terrainwidth, multiplier, sigma) {
 	let linesize = terrainwidth * multiplier + multiplier;
 	let multipliedMap = new Array(linesize * linesize);
 	let imagesize = linesize - multiplier + 1;
@@ -96,7 +100,10 @@ function mapMultiplier(heightmap, terrainwidth, multiplier, sigma) {
 	multipliedMap = multipliedMap.filter((h, i) => h != null);
 	multipliedMap = multipliedMap.slice(0, multipliedMap.length - imagesize * (multiplier - 1));
 
+	console.log(sigma, multiplier);
 	if (sigma > 0 && multiplier > 1) {
+		console.log(sigma, multiplier);
+
 		gaussBlur(multipliedMap, new Array(multipliedMap.length), imagesize, imagesize, sigma);
 	}
 	return multipliedMap;

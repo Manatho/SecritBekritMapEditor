@@ -1,15 +1,27 @@
 let THREE = require("../../libs/threemin.js");
+const PIXEL_PER_METER = 4;
 
 class Terrain {
-	constructor(mapsize, indicesize, indiceworldsize) {
-		//this.mapSize = 4096;  this.indiceWorlSize = 8000;  var indiceSize = 128;
+	constructor(mapsize, indiceworldsize, indiceSize, baseline, min, max) {
 		this.mapSize = mapsize;
-		this.indiceWorlSize = indicesize;
-		var indiceSize = indiceworldsize;
-		//this.mapSize = 1024;this.indiceWorlSize = 2000;let indiceSize = 128;
-		//this.mapSize = 512;  this.indiceWorlSize = 1000;  var indiceSize = 64;
-		//this.mapSize = 256;  this.indiceWorlSize = 500;  var indiceSize = 32;
-		//this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
+		this.indiceWorlSize = indiceworldsize * PIXEL_PER_METER;
+		this.min = Math.max(0, min);
+		this.baseline = Math.max(baseline, this.min);
+		this.max = max;
+
+		let indiceCount = this.mapSize / indiceSize;
+
+		let waterGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize * indiceCount, this.indiceWorlSize * indiceCount, 1, 1);
+		let waterMaterail = new THREE.MeshBasicMaterial({
+			color: 0x0000ff,
+			side: THREE.FrontSide,
+			transparent: true,
+			opacity: 0.5
+		});
+		this._water = new THREE.Mesh(waterGeometry, waterMaterail);
+		this._water.renderDepth = 10;
+		this._water.rotation.x = -Math.PI / 2;
+		this._water.position.y = 99.8;
 
 		let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
 		let planeMaterial = new THREE.MeshLambertMaterial({
@@ -27,23 +39,27 @@ class Terrain {
 		this._grid = [];
 		this._indiceSize = indiceSize + 1;
 
-		let split = this.mapSize / indiceSize;
 		//let split = indiceSize;
 
-		for (let x = 0; x < split; x++) {
-			for (let z = 0; z < split; z++) {
+		for (let x = 0; x < indiceCount; x++) {
+			for (let z = 0; z < indiceCount; z++) {
 				let geometryClone = planeGeometry.clone();
 				let mesh = new THREE.Mesh(geometryClone, planeMaterial);
 				let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
 
+				mesh.renderDepth = 0;
+				grid.renderDepth = 1;
+
 				mesh.rotation.x = -Math.PI / 2;
 				grid.rotation.x = -Math.PI / 2;
 
-				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (split - 1)) / 2;
-				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (split - 1)) / 2;
+				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				mesh.position.y = baseline;
 
-				grid.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (split - 1)) / 2;
-				grid.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (split - 1)) / 2;
+				grid.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				grid.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				grid.position.y = baseline;
 
 				this._meshes.push(mesh);
 				this._grid.push(grid);
@@ -53,30 +69,30 @@ class Terrain {
 		this._meshes.forEach((mesh, index) => {
 			mesh.neighbour = new Array(9);
 
-			if (index % split != 0) {
-				mesh.neighbour[0] = this._meshes[index - split - 1];
+			if (index % indiceCount != 0) {
+				mesh.neighbour[0] = this._meshes[index - indiceCount - 1];
 				mesh.neighbour[3] = this._meshes[index - 1];
-				mesh.neighbour[6] = this._meshes[index + split - 1];
+				mesh.neighbour[6] = this._meshes[index + indiceCount - 1];
 			}
 
-			if ((index + 1) % split != 0) {
-				mesh.neighbour[2] = this._meshes[index - split + 1];
+			if ((index + 1) % indiceCount != 0) {
+				mesh.neighbour[2] = this._meshes[index - indiceCount + 1];
 				mesh.neighbour[5] = this._meshes[index + 1];
-				mesh.neighbour[8] = this._meshes[index + split + 1];
+				mesh.neighbour[8] = this._meshes[index + indiceCount + 1];
 			}
 
-			if (index / split > 0) {
-				mesh.neighbour[1] = this._meshes[index - split];
+			if (index / indiceCount > 0) {
+				mesh.neighbour[1] = this._meshes[index - indiceCount];
 			}
 
-			if (index + split < split * split) {
-				mesh.neighbour[7] = this._meshes[index + split];
+			if (index + indiceCount < indiceCount * indiceCount) {
+				mesh.neighbour[7] = this._meshes[index + indiceCount];
 			}
 
 			for (let i = 0; i < mesh.neighbour.length; i++) {
 				const element = mesh.neighbour[i];
 
-				if (element == null || element < 0 || element > split * split - 1) {
+				if (element == null || element < 0 || element > indiceCount * indiceCount - 1) {
 					mesh.neighbour[i] = null;
 				}
 			}
@@ -91,6 +107,8 @@ class Terrain {
 		this._grid.forEach(grid => {
 			scene.add(grid);
 		});
+
+		scene.add(this._water);
 	}
 
 	removeFromScene(scene) {
@@ -111,11 +129,19 @@ class Terrain {
 			grid.material = null;
 			grid = null;
 		});
+
+		scene.remove(this._water);
+		this._water.geometry.dispose();
+		this._water.geometry = null;
+		this._water.material.dispose();
+		this._water.material = null;
+		this._water = null;
 	}
 
 	getHeightValues() {
 		let height = new Array((this.mapSize + 1) * (this.mapSize + 1));
 		let indice = this._indiceSize - 1;
+
 		this._meshes.forEach(mesh => {
 			for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
 				let vertex = getVertex(mesh.geometry, i);
@@ -124,11 +150,11 @@ class Terrain {
 				//Transform to globalspace, map to indexes and set minimum at (0,0)
 				//(500,-500) -> (1,-1) -> (2,0)
 				pos.x = (pos.x + vertex.x) / (this.indiceWorlSize / indice) + this.mapSize / 2;
-				pos.z = (pos.z + vertex.y) / (this.indiceWorlSize / indice) + this.mapSize / 2;
+				pos.z = (pos.z - vertex.y) / (this.indiceWorlSize / indice) + this.mapSize / 2;
 
 				pos.x = Math.round(pos.x);
 				pos.z = Math.round(pos.z);
-				height[pos.z + pos.x * (this.mapSize + 1)] = vertex.z;
+				height[pos.z + pos.x * (this.mapSize + 1)] = vertex.z + this.baseline;
 			}
 		});
 
@@ -255,7 +281,12 @@ class Terrain {
 				if (!indexedVertices[element.index.y]) indexedVertices[element.index.y] = [];
 
 				if (!indexedVertices[element.index.y][element.index.x]) {
-					indexedVertices[element.index.y][element.index.x] = new ToolableVertex(element.vertex, element.mesh);
+					indexedVertices[element.index.y][element.index.x] = new ToolableVertex(
+						element.vertex,
+						element.mesh,
+						this.min - this.baseline,
+						this.max
+					);
 				}
 				indexedVertices[element.index.y][element.index.x]._vertices.push(element.vertex);
 				indexedVertices[element.index.y][element.index.x]._meshes.push(element.mesh);
@@ -269,8 +300,6 @@ class Terrain {
 	}
 
 	updateGeometries(meshgeometriesToUpdate) {
-		//console.log(meshgeometriesToUpdate);
-
 		meshgeometriesToUpdate.forEach(element => {
 			element.computeFaceNormals();
 			element.computeVertexNormals();
@@ -383,19 +412,19 @@ function getVertex(geometry, index) {
 }
 
 class ToolableVertex {
-	constructor(vertices, meshes) {
+	constructor(vertices, meshes, min, max) {
 		if (!Array.isArray(vertices)) {
 			vertices = [vertices];
 			meshes = [meshes];
 		}
 		this._vertices = vertices;
 		this._meshes = meshes;
+		this._min = min;
+		this._max = max;
 	}
 
 	set height(value) {
-		console.log(value);
-
-		value = Math.min(800, Math.max(0, value));
+		value = Math.min(this._max, Math.max(this._min, value));
 		this._meshes.forEach((mesh, index) => {
 			mesh.geometry.attributes.position.array[this._vertices[index].index + 2] = value;
 		});
