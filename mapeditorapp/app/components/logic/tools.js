@@ -130,9 +130,9 @@ function defaultTooling(tool, toolableVertices, invert) {
 	tool.iterateBrush((x, y, strength) => {
 		if (toolableVertices[y] && toolableVertices[y][x]) {
 			if (invert) {
-				toolableVertices[y][x].height += strength * tool.toolOptions.strength.value;
-			} else {
 				toolableVertices[y][x].height -= strength * tool.toolOptions.strength.value;
+			} else {
+				toolableVertices[y][x].height += strength * tool.toolOptions.strength.value;
 			}
 		}
 	});

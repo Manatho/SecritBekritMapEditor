@@ -11,7 +11,6 @@ import { Controller } from "../../../logic/controller.js";
 import { gaussBlur } from "./export-logic/gaussianblur.js";
 import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
 
-let sigma = 1.5;
 let max = 390;
 let min = -1110;
 
@@ -29,7 +28,8 @@ export default {
 			setTimeout(function() {
 				let heightmap = Controller.terrain.getHeightValues();
 				let multiplier = Controller.scaling;
-				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier);
+				let sigma = multiplier / 2;
+				heightmap = mapMultiplier(heightmap, Controller.terrain.mapSize, multiplier, sigma);
 
 				const worker = new Worker();
 
@@ -68,7 +68,7 @@ function lerp(num, in_min, in_max, out_min, out_max) {
 	return lerped;
 }
 
-function mapMultiplier(heightmap, terrainwidth, multiplier) {
+function mapMultiplier(heightmap, terrainwidth, multiplier, sigma) {
 	let linesize = terrainwidth * multiplier + multiplier;
 	let multipliedMap = new Array(linesize * linesize);
 	let imagesize = linesize - multiplier + 1;
@@ -84,7 +84,7 @@ function mapMultiplier(heightmap, terrainwidth, multiplier) {
 		for (let x = 0; x < multiplier; x++) {
 			for (let y = 0; y < multiplier; y++) {
 				if ((i + 1) % terrainwidth != 0 || x == 0) {
-					multipliedMap[index + x + linesize * y] = lerp(value, max, min, 0, 65535);
+					multipliedMap[index + x + linesize * y] = lerp(value, min, max, 0, 65535);
 				} else {
 					multipliedMap[index + x + linesize * y] = null;
 				}

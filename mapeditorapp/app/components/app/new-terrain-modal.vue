@@ -25,6 +25,7 @@
 				</div>
 			</div>
 			<button @click="createTerrain" class="create">Create</button>
+			<button v-show="terrainExists()" @click="render = false" class="create">Cancel</button>
 		</div>
 	</div>
 </template>
@@ -40,6 +41,9 @@ export default {
 		},
 		show() {
 			this.render = true;
+		},
+		terrainExists() {
+			return Controller.terrain != null;
 		}
 	},
 	data() {

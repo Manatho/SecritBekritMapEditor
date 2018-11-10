@@ -14,7 +14,7 @@ class Terrain {
 		let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
 		let planeMaterial = new THREE.MeshLambertMaterial({
 			color: 0xffffff,
-			side: THREE.BackSide
+			side: THREE.FrontSide
 		});
 		let planeWireMaterial = new THREE.MeshBasicMaterial({
 			color: 0x000000,
@@ -36,8 +36,8 @@ class Terrain {
 				let mesh = new THREE.Mesh(geometryClone, planeMaterial);
 				let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
 
-				mesh.rotation.x = Math.PI / 2;
-				grid.rotation.x = Math.PI / 2;
+				mesh.rotation.x = -Math.PI / 2;
+				grid.rotation.x = -Math.PI / 2;
 
 				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (split - 1)) / 2;
 				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (split - 1)) / 2;
@@ -54,15 +54,15 @@ class Terrain {
 			mesh.neighbour = new Array(9);
 
 			if (index % split != 0) {
-				mesh.neighbour[2] = this._meshes[index - split - 1];
-				mesh.neighbour[5] = this._meshes[index - 1];
-				mesh.neighbour[8] = this._meshes[index + split - 1];
+				mesh.neighbour[0] = this._meshes[index - split - 1];
+				mesh.neighbour[3] = this._meshes[index - 1];
+				mesh.neighbour[6] = this._meshes[index + split - 1];
 			}
 
 			if ((index + 1) % split != 0) {
-				mesh.neighbour[0] = this._meshes[index - split + 1];
-				mesh.neighbour[3] = this._meshes[index + 1];
-				mesh.neighbour[6] = this._meshes[index + split + 1];
+				mesh.neighbour[2] = this._meshes[index - split + 1];
+				mesh.neighbour[5] = this._meshes[index + 1];
+				mesh.neighbour[8] = this._meshes[index + split + 1];
 			}
 
 			if (index / split > 0) {
@@ -393,6 +393,9 @@ class ToolableVertex {
 	}
 
 	set height(value) {
+		console.log(value);
+
+		value = Math.min(800, Math.max(0, value));
 		this._meshes.forEach((mesh, index) => {
 			mesh.geometry.attributes.position.array[this._vertices[index].index + 2] = value;
 		});
