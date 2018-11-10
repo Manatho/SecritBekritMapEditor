@@ -1,4 +1,6 @@
-<template></template>
+<template>
+	<canvas ref="threejs"></canvas>
+</template>
 
 <script>
 //Libs and logic
@@ -45,7 +47,7 @@ function setupToolApply() {
 	InputController.add("mousemove", onDocumentMouseMove, { render: true });
 }
 
-function setupThree() {
+function setupThree(canvas) {
 	//Scene
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color(0xbab8b4);
@@ -56,9 +58,9 @@ function setupThree() {
 	initAddons();
 	setupToolApply();
 
-	let renderer = new THREE.WebGLRenderer({ antialias: false });
+	let renderer = new THREE.WebGLRenderer({ antialias: false, canvas: canvas });
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.insertBefore(renderer.domElement, document.body.firstChild);
+	//document.body.insertBefore(renderer.domElement, document.body.firstChild);
 	renderer.domElement.className = "Three";
 	renderer.domElement.addEventListener("mousedown", e => {
 		document.activeElement.blur();
@@ -97,9 +99,11 @@ function setTerrain(newterrain) {
 	terrain = newterrain;
 }
 
-setupThree();
-
-export default {};
+export default {
+	mounted() {
+		setupThree(this.$refs.threejs);
+	}
+};
 </script>
 
 <style lang="scss">

@@ -1,8 +1,8 @@
 <template>
     <div>
+        <Editor></Editor>
 		<Menubar v-bind:menuElements="menuElements"></Menubar>
         <Toolbar></Toolbar>
-        <Editor></Editor>
 		<NewTerrain ref="child"></NewTerrain>
 		<Progressbar></Progressbar>
     </div>
