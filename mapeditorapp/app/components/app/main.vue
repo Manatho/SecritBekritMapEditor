@@ -5,6 +5,7 @@
         <Toolbar></Toolbar>
 		<NewTerrain ref="child"></NewTerrain>
 		<Progressbar></Progressbar>
+		<p class="versioning">Version 0.0 (Alpha)</p>
     </div>
 </template>
 
@@ -38,4 +39,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.versioning {
+	position: absolute;
+	right: 10px;
+	top: 0px;
+}
 </style>
