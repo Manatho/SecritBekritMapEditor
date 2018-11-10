@@ -57,7 +57,6 @@ export class Options {
 export class Tool {
 	constructor(brushtype, methods, options) {
 		this.options = options.all;
-		console.log(this.options);
 
 		this.toolOptions = options.tools;
 		this.brushOptions = options.brush;
@@ -130,6 +129,8 @@ function defaultTooling(tool, toolableVertices, invert) {
 	tool.iterateBrush((x, y, strength) => {
 		if (toolableVertices[y] && toolableVertices[y][x]) {
 			if (invert) {
+				//console.log(strength * tool.toolOptions.strength.value, toolableVertices[y][x].height);
+
 				toolableVertices[y][x].height -= strength * tool.toolOptions.strength.value;
 			} else {
 				toolableVertices[y][x].height += strength * tool.toolOptions.strength.value;

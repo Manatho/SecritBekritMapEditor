@@ -10,19 +10,21 @@ function average(tool, toolableVertices) {
 	let tv = toolableVertices;
 	tool.iterateBrush((x, y, strength) => {
 		if (strength > 0) {
-			let average =
-				(tv[y - 1][x - 1].height +
-					tv[y - 1][x].height +
-					tv[y - 1][x + 1].height +
-					tv[y][x - 1].height +
-					tv[y][x].height +
-					tv[y][x + 1].height +
-					tv[y + 1][x - 1].height +
-					tv[y + 1][x].height +
-					tv[y + 1][x + 1].height) /
-				9;
+			let val = 0;
+			let count = 0;
+			for (let xm = -1; xm <= 1; xm++) {
+				for (let ym = -1; ym <= 1; ym++) {
+					if (tv[y + ym] != null && tv[y + ym][x + xm] != null) {
+						val += tv[y + ym][x + xm].height;
+					} else {
+						count++;
+					}
+				}
+			}
 
-			tv[y][x].height = average;
+			if (tv[y] != null && tv[y][x] != null) {
+				tv[y][x].height = val / (9 - count);
+			}
 		}
 	});
 }
