@@ -51,12 +51,19 @@ export const Controller = {
 		// this.mapSize = 512; this.indiceWorlSize = 1000; var indiceSize = 64;
 		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
 		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
-
+		//terrain = new Terrain(6, 250, 2, baselineheight, 0, 1000);
 		terrain = new Terrain(actualSize, indiceworldsize, indeiceSize, baselineheight, 0, 1000);
 		scaling = scale;
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
 		this.requestRender();
+	},
+	async loadTerrain(file, progress) {
+		terrain = await Terrain.load(file, progress);
+		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
+	},
+	saveTerrain() {
+		terrain.save();
 	},
 	get pngData() {
 		return pngdata;
@@ -88,3 +95,6 @@ export const ControllerEvents = {
 	Event_PNG_Data_Changed: "png-data-changed",
 	Event_Terrain_Changed: "terrain-changed"
 };
+
+window.Controller = Controller;
+window.Terrain = Terrain;

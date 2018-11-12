@@ -38,7 +38,7 @@ let ProgressbarController = {
 };
 
 export default {
-	Progressbar: ProgressbarController,
+	controller: ProgressbarController,
 	data() {
 		return {
 			visible: false,

@@ -84,24 +84,23 @@ function setupThree(canvas) {
 	}
 
 	Controller.subscribe(ControllerEvents.Event_Terrain_Changed, setTerrain);
-
-	window.Controller = Controller;
 }
 
 let terrain;
 function setTerrain(newterrain) {
 	if (terrain) {
-		console.log("Remove");
 		terrain.removeFromScene(scene);
 	}
-	console.log("Add");
-	newterrain.addToScene(scene);
 	terrain = newterrain;
+	if (newterrain != null) {
+		newterrain.addToScene(scene);
+	}
 }
 
 export default {
 	mounted() {
 		setupThree(this.$refs.threejs);
+		window.scene = scene;
 	}
 };
 </script>

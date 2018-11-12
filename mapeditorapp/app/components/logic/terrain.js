@@ -1,5 +1,29 @@
+import pako from "pako";
+import { StringDecoder } from "string_decoder";
+
 let THREE = require("../../libs/threemin.js");
+require("./lib/GLTFExporter.js");
+require("./lib/GTFLoader.js");
+
 const PIXEL_PER_METER = 4;
+
+let waterMaterial = new THREE.MeshBasicMaterial({
+	color: 0x0000ff,
+	side: THREE.FrontSide,
+	transparent: true,
+	opacity: 0.5
+});
+
+let planeMaterial = new THREE.MeshLambertMaterial({
+	color: 0xffffff,
+	side: THREE.FrontSide
+});
+let planeWireMaterial = new THREE.MeshBasicMaterial({
+	color: 0x000000,
+	wireframe: true,
+	transparent: true,
+	opacity: 0.05
+});
 
 class Terrain {
 	constructor(mapsize, indiceworldsize, indiceSize, baseline, min, max) {
@@ -10,42 +34,27 @@ class Terrain {
 		this.max = max;
 
 		let indiceCount = this.mapSize / indiceSize;
-
 		let waterGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize * indiceCount, this.indiceWorlSize * indiceCount, 1, 1);
-		let waterMaterail = new THREE.MeshBasicMaterial({
-			color: 0x0000ff,
-			side: THREE.FrontSide,
-			transparent: true,
-			opacity: 0.5
-		});
-		this._water = new THREE.Mesh(waterGeometry, waterMaterail);
+
+		this._water = new THREE.Mesh(waterGeometry, waterMaterial);
+		this._water.name = "Water";
 		this._water.renderDepth = 10;
 		this._water.rotation.x = -Math.PI / 2;
 		this._water.position.y = 99.8;
 
 		let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
-		let planeMaterial = new THREE.MeshLambertMaterial({
-			color: 0xffffff,
-			side: THREE.FrontSide
-		});
-		let planeWireMaterial = new THREE.MeshBasicMaterial({
-			color: 0x000000,
-			wireframe: true,
-			transparent: true,
-			opacity: 0.05
-		});
 
+		this._indiceSize = indiceSize + 1;
 		this._meshes = [];
 		this._grid = [];
-		this._indiceSize = indiceSize + 1;
-
-		//let split = indiceSize;
 
 		for (let x = 0; x < indiceCount; x++) {
 			for (let z = 0; z < indiceCount; z++) {
 				let geometryClone = planeGeometry.clone();
 				let mesh = new THREE.Mesh(geometryClone, planeMaterial);
+				mesh.name = "mesh:x" + x + ":z" + z;
 				let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
+				grid.name = "grid:x" + x + ":z" + z;
 
 				mesh.renderDepth = 0;
 				grid.renderDepth = 1;
@@ -65,38 +74,7 @@ class Terrain {
 				this._grid.push(grid);
 			}
 		}
-
-		this._meshes.forEach((mesh, index) => {
-			mesh.neighbour = new Array(9);
-
-			if (index % indiceCount != 0) {
-				mesh.neighbour[0] = this._meshes[index - indiceCount - 1];
-				mesh.neighbour[3] = this._meshes[index - 1];
-				mesh.neighbour[6] = this._meshes[index + indiceCount - 1];
-			}
-
-			if ((index + 1) % indiceCount != 0) {
-				mesh.neighbour[2] = this._meshes[index - indiceCount + 1];
-				mesh.neighbour[5] = this._meshes[index + 1];
-				mesh.neighbour[8] = this._meshes[index + indiceCount + 1];
-			}
-
-			if (index / indiceCount > 0) {
-				mesh.neighbour[1] = this._meshes[index - indiceCount];
-			}
-
-			if (index + indiceCount < indiceCount * indiceCount) {
-				mesh.neighbour[7] = this._meshes[index + indiceCount];
-			}
-
-			for (let i = 0; i < mesh.neighbour.length; i++) {
-				const element = mesh.neighbour[i];
-
-				if (element == null || element < 0 || element > indiceCount * indiceCount - 1) {
-					mesh.neighbour[i] = null;
-				}
-			}
-		});
+		setNeighbours(this._meshes, indiceCount);
 	}
 
 	addToScene(scene) {
@@ -154,13 +132,32 @@ class Terrain {
 
 				pos.x = Math.round(pos.x);
 				pos.z = Math.round(pos.z);
-				height[pos.z + pos.x * (this.mapSize + 1)] = vertex.z + this.baseline;
+				height[pos.x + pos.z * (this.mapSize + 1)] = vertex.z + this.baseline;
 			}
 		});
 
 		return height;
 	}
+	setHeights(array) {
+		console.log(this.mapSize / (this._indiceSize - 1));
 
+		array.forEach((height, i) => {
+			let indexer = newMap2dTo1d(i % (this.mapSize + 1), (i / (this.mapSize + 1)) >> 0, this._indiceSize, this._meshes[0]);
+
+			if (indexer != null) {
+				indexer.affected.geometry.attributes.position.array[indexer.index * 3 + 2] = height - this.baseline;
+
+				indexer.edgeSharingNeighbours.forEach(sharer => {
+					let targetNeighbour = indexer.affected.neighbour[sharer.neighbour];
+					if (targetNeighbour != null) {
+						targetNeighbour.geometry.attributes.position.array[sharer.index * 3 + 2] = height - this.baseline;
+					}
+				});
+			}
+		});
+
+		this.updateGeometries(this._meshes.map(x => x.geometry));
+	}
 	getAffectedMeshesAndVertices(raycaster, brush2d) {
 		// the mesh clicked is found:
 		let intersects = raycaster.intersectObjects(this._meshes);
@@ -220,20 +217,19 @@ class Terrain {
 						x: x - vertex2dIndex.x + brushOffset.x
 					};
 
-					//Convert indexes back to 1d array -> Some indexes may be outside the initial target object!
-					let indexer = this._map2dTo1d(x, y, this._indiceSize);
+					//Convert indexes back to 1d array
+					let indexer = newMap2dTo1d(x, y, this._indiceSize, target);
 
-					//Neighbour is only set if index is not the initial target
-					if (indexer.neighbour == null) {
+					if (indexer && indexer.affected != null) {
 						verticesToTransform.push({
-							vertex: getVertex(target.geometry, indexer.index),
+							vertex: getVertex(indexer.affected.geometry, indexer.index),
 							index: brushindex,
-							mesh: target
+							mesh: indexer.affected
 						});
 
 						//If on the edge of an object, the touching vertices of the neighbour should be updated aswell
 						indexer.edgeSharingNeighbours.forEach(sharer => {
-							let targetNeighbour = target.neighbour[sharer.neighbour];
+							let targetNeighbour = indexer.affected.neighbour[sharer.neighbour];
 							if (targetNeighbour != null) {
 								verticesToTransform.push({
 									vertex: getVertex(targetNeighbour.geometry, sharer.index),
@@ -243,29 +239,6 @@ class Terrain {
 								meshgeometriesToUpdate.push(targetNeighbour.geometry);
 							}
 						});
-					} else {
-						//If the index fall within a neighbour, do the same as above with the neighbour as the target
-						let targetNeighbour = target.neighbour[indexer.neighbour];
-						if (targetNeighbour != null) {
-							verticesToTransform.push({
-								vertex: getVertex(targetNeighbour.geometry, indexer.index),
-								index: brushindex,
-								mesh: targetNeighbour
-							});
-							meshgeometriesToUpdate.push(targetNeighbour.geometry);
-
-							indexer.edgeSharingNeighbours.forEach(sharer => {
-								targetNeighbour = targetNeighbour.neighbour[sharer.neighbour];
-								if (targetNeighbour != null) {
-									verticesToTransform.push({
-										vertex: getVertex(targetNeighbour.geometry, sharer.index),
-										index: brushindex,
-										mesh: targetNeighbour
-									});
-									meshgeometriesToUpdate.push(targetNeighbour.geometry);
-								}
-							});
-						}
 					}
 				}
 			}
@@ -304,97 +277,78 @@ class Terrain {
 			element.computeFaceNormals();
 			element.computeVertexNormals();
 			element.attributes.position.needsUpdate = true;
-			//element.verticesNeedUpdate = true;
+			element.verticesNeedUpdate = true;
 			element.normalsNeedUpdate = true;
 		});
 	}
+	save() {
+		let heightdata = new Float64Array(this.getHeightValues());
+		let buffer = new ArrayBuffer(heightdata.byteLength);
+		let test = new Float64Array(buffer);
+		test.set(heightdata);
+		let bytes = new Uint8Array(buffer);
 
-	_map2dTo1d(x, y, size) {
-		return mapper(x, y, size, null);
+		console.log(test);
+		heightdata = pako.deflate(bytes, { level: 9, windowBits: 8, strategy: 1 });
 
-		function mapper(x, y, size, neighbourindex) {
-			let index = y * size + x;
-			let neighbour = neighbourindex;
-			let edgeSharingNeighbours = [];
+		let savedTerrain = {
+			min: this.min,
+			max: this.max,
+			baseline: this.baseline,
+			mapsize: this.mapSize,
+			indiceWorldSize: this.indiceWorlSize / PIXEL_PER_METER,
+			indiceSize: this._indiceSize - 1,
+			heightData: heightdata
+		};
 
-			//Out of bounds
-			if (x < 0) {
-				if (y < 0) {
-					//1 is added or subtracted to skip the first point,
-					//which is shared between the two
-					return mapper(x + size - 1, y + size - 1, size, 0);
-				} else if (y >= size) {
-					return mapper(x + size - 1, y - size + 1, size, 2);
-				} else {
-					return mapper(x + size - 1, y, size, 1);
-				}
-			} else if (x >= size) {
-				if (y < 0) {
-					return mapper(x - size + 1, y + size - 1, size, 6);
-				} else if (y >= size) {
-					return mapper(x - size + 1, y - size + 1, size, 8);
-				} else {
-					return mapper(x - size + 1, y, size, 7);
-				}
-			} else if (y < 0) {
-				return mapper(x, y + size - 1, size, 3);
-			} else if (y >= size) {
-				return mapper(x, y - size + 1, size, 5);
-			}
+		let data = Buffer.from(JSON.stringify(savedTerrain));
 
-			//Edge sharing
-			if (x == 0) {
-				if (y == 0) {
-					edgeSharingNeighbours.push({
-						neighbour: 0,
-						index: size * size - 1
-					});
-				} else if (y == size - 1) {
-					edgeSharingNeighbours.push({
-						neighbour: 2,
-						index: size - 1
-					});
-				}
-				edgeSharingNeighbours.push({
-					neighbour: 1,
-					index: index + size - 1
-				});
-			} else if (x == size - 1) {
-				if (y == 0) {
-					edgeSharingNeighbours.push({
-						neighbour: 6,
-						index: size * (size - 1)
-					});
-				} else if (y == size - 1) {
-					edgeSharingNeighbours.push({ neighbour: 8, index: 0 });
-				}
-				edgeSharingNeighbours.push({
-					neighbour: 7,
-					index: index - (size - 1)
-				});
-			}
-			if (y == 0) {
-				edgeSharingNeighbours.push({
-					neighbour: 3,
-					index: index + size * (size - 1)
-				});
-			}
-			if (y == size - 1) {
-				edgeSharingNeighbours.push({
-					neighbour: 5,
-					index: index - size * (size - 1)
-				});
-			}
+		data = pako.deflate(data, { level: 9, windowBits: 8, strategy: 1 });
 
-			return {
-				neighbour: neighbour,
-				edgeSharingNeighbours: edgeSharingNeighbours,
-				index: index
-			};
-		}
+		let blob = new Blob([data], { type: "application/octet-stream" });
+		url = URL.createObjectURL(blob);
+
+		let element = document.createElement("a");
+		element.setAttribute("href", url);
+		element.setAttribute("download", "Terrain.tfm");
+		element.style.display = "none";
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+
+		console.log("Done");
+	}
+	static async load(file, progress) {
+		const terrain = await new Promise(function(resolve, reject) {
+			//var xhr = new XMLHttpRequest();
+			//xhr.open("GET", url, true);
+			//xhr.responseType = "blob";
+			//xhr.onload = function(e) {
+			//	if (this.status == 200) {
+			//let blob = this.response;
+			let reader = new FileReader();
+			reader.addEventListener("loadend", function() {
+				let buffer = pako.inflate(reader.result);
+				let text = new TextDecoder("utf-8").decode(buffer);
+				//TerrainSave
+				let ts = JSON.parse(text);
+				ts.heightData = new Float64Array(pako.inflate(ts.heightData).buffer);
+
+				let terrain = new Terrain(ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
+				terrain.setHeights(ts.heightData);
+				resolve(terrain);
+			});
+			reader.readAsArrayBuffer(file);
+			//	}
+			//};
+			//xhr.send();
+		});
+		console.log(terrain);
+
+		return terrain;
 	}
 }
-
+let url;
 function getVertex(geometry, index) {
 	let positions = geometry.attributes.position.array;
 	let x = positions[index * 3];
@@ -409,6 +363,140 @@ function getVertex(geometry, index) {
 	vertex.index = index * 3;
 
 	return vertex;
+}
+
+function setNeighbours(meshes, width) {
+	meshes.forEach((mesh, index) => {
+		mesh.neighbour = new Array(9);
+
+		if (index % width != 0) {
+			mesh.neighbour[0] = meshes[index - width - 1];
+			mesh.neighbour[3] = meshes[index - 1];
+			mesh.neighbour[6] = meshes[index + width - 1];
+		}
+
+		if ((index + 1) % width != 0) {
+			mesh.neighbour[2] = meshes[index - width + 1];
+			mesh.neighbour[5] = meshes[index + 1];
+			mesh.neighbour[8] = meshes[index + width + 1];
+		}
+
+		if (index / width > 0) {
+			mesh.neighbour[1] = meshes[index - width];
+		}
+
+		if (index + width < width * width) {
+			mesh.neighbour[7] = meshes[index + width];
+		}
+
+		for (let i = 0; i < mesh.neighbour.length; i++) {
+			let element = mesh.neighbour[i];
+
+			if (element == null || element < 0 || element > width * width - 1) {
+				mesh.neighbour[i] = null;
+			}
+		}
+	});
+}
+
+function newMap2dTo1d(x, y, size, mesh) {
+	return mapper(x, y, size, null, []);
+
+	function mapper(x, y, size, neighbourindex, path) {
+		let index = y * size + x;
+
+		let neighbour = neighbourindex;
+		if (neighbourindex != null) path.push(neighbourindex);
+		let edgeSharingNeighbours = [];
+
+		if (mesh == null) {
+			return null;
+		}
+
+		//Out of bounds
+		if (x < 0) {
+			if (y < 0) {
+				//1 is added or subtracted to skip the first point,
+				//which is shared between the two
+				mesh = mesh.neighbour[0];
+				return mapper(x + size - 1, y + size - 1, size, 0, path);
+			} else if (y >= size) {
+				mesh = mesh.neighbour[2];
+				return mapper(x + size - 1, y - size + 1, size, 2, path);
+			} else {
+				mesh = mesh.neighbour[1];
+				return mapper(x + size - 1, y, size, 1, path);
+			}
+		} else if (x >= size) {
+			if (y < 0) {
+				mesh = mesh.neighbour[6];
+				return mapper(x - size + 1, y + size - 1, size, 6, path);
+			} else if (y >= size) {
+				mesh = mesh.neighbour[8];
+				return mapper(x - size + 1, y - size + 1, size, 8, path);
+			} else {
+				mesh = mesh.neighbour[7];
+				return mapper(x - size + 1, y, size, 7, path);
+			}
+		} else if (y < 0) {
+			mesh = mesh.neighbour[3];
+			return mapper(x, y + size - 1, size, 3, path);
+		} else if (y >= size) {
+			mesh = mesh.neighbour[5];
+			return mapper(x, y - size + 1, size, 5, path);
+		}
+
+		//Edge sharing
+		if (x == 0) {
+			if (y == 0) {
+				edgeSharingNeighbours.push({
+					neighbour: 0,
+					index: size * size - 1
+				});
+			} else if (y == size - 1) {
+				edgeSharingNeighbours.push({
+					neighbour: 2,
+					index: size - 1
+				});
+			}
+			edgeSharingNeighbours.push({
+				neighbour: 1,
+				index: index + size - 1
+			});
+		} else if (x == size - 1) {
+			if (y == 0) {
+				edgeSharingNeighbours.push({
+					neighbour: 6,
+					index: size * (size - 1)
+				});
+			} else if (y == size - 1) {
+				edgeSharingNeighbours.push({ neighbour: 8, index: 0 });
+			}
+			edgeSharingNeighbours.push({
+				neighbour: 7,
+				index: index - (size - 1)
+			});
+		}
+		if (y == 0) {
+			edgeSharingNeighbours.push({
+				neighbour: 3,
+				index: index + size * (size - 1)
+			});
+		}
+		if (y == size - 1) {
+			edgeSharingNeighbours.push({
+				neighbour: 5,
+				index: index - size * (size - 1)
+			});
+		}
+
+		return {
+			affected: mesh,
+			edgeSharingNeighbours: edgeSharingNeighbours,
+			path: path,
+			index: index
+		};
+	}
 }
 
 class ToolableVertex {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-let Progressbar = require("../../progressbar.vue").default.Progressbar;
+let Progressbar = require("../../progressbar.vue").default.controller;
 
 import { Controller } from "../../../logic/controller.js";
 import { gaussBlur } from "./export-logic/gaussianblur.js";

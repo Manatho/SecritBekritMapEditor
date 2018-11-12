@@ -21,7 +21,7 @@ module.exports = {
 		rules: [
 			{ test: /\.vue$/, include: /app/, loader: "vue-loader" },
 			{ test: /\.scss$/, use: ["style-loader", "css-loader", "sass-loader"] },
-			{ test: /\.(png|jp(e*)g|svg)$/, use: ["file-loader"] },
+			{ test: /\.(tfm|png|jp(e*)g|svg)$/, use: ["file-loader"] },
 			{ test: /\.worker\.js$/, use: { loader: "worker-loader" } }
 		]
 	},
