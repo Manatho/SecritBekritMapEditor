@@ -2,8 +2,6 @@ import pako from "pako";
 import { StringDecoder } from "string_decoder";
 
 let THREE = require("../../libs/threemin.js");
-require("./lib/GLTFExporter.js");
-require("./lib/GTFLoader.js");
 
 const PIXEL_PER_METER = 4;
 
