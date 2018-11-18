@@ -5,7 +5,7 @@
         <Toolbar></Toolbar>
 		<NewTerrain ref="child"></NewTerrain>
 		<Progressbar></Progressbar>
-		<p class="versioning">Version 0.0 (Alpha)</p>
+		<p class="versioning">Version 0.1 (Alpha)</p>
     </div>
 </template>
 
