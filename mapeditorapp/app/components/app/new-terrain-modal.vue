@@ -24,8 +24,8 @@
 					</label>
 				</div>
 			</div>
-			<button @click="createTerrain" class="create">Create</button>
-			<button @click="render = false" class="create">Cancel</button>
+			<button @click="createTerrain" class="button">Create</button>
+			<button @click="render = false" class="button">Cancel</button>
 		</div>
 	</div>
 </template>
@@ -49,7 +49,7 @@ export default {
 			Sizes: [1024, 2048, 3072, 4096, 5120, 6144],
 			selectedScale: 1,
 			selectedSize: 1024,
-			render: true
+			render: false
 		};
 	}
 };
@@ -99,7 +99,7 @@ export default {
 	border-radius: 4px;
 }
 
-.create {
+.button {
 	margin: 5px;
 	border: none;
 	background-color: $element-backgroundlight;
