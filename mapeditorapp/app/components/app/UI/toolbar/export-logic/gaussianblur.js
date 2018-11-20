@@ -1,11 +1,12 @@
 // http://blog.ivank.net/fastest-gaussian-blur.html
 // Ivan kutskir, algorithm based on slides made by Wojciech Jarosz on fast image convolutions
 
-export function gaussBlur(scl, tcl, w, h, r) {
+export function gaussBlur(source, w, h, r) {
+	let output = new Uint16Array(source.length);
 	var bxs = boxesForGauss(r, 3);
-	boxBlur(scl, tcl, w, h, (bxs[0] - 1) / 2);
-	boxBlur(tcl, scl, w, h, (bxs[1] - 1) / 2);
-	boxBlur(scl, tcl, w, h, (bxs[2] - 1) / 2);
+	boxBlur(source, tcl, w, h, (bxs[0] - 1) / 2);
+	boxBlur(tcl, source, w, h, (bxs[1] - 1) / 2);
+	boxBlur(source, tcl, w, h, (bxs[2] - 1) / 2);
 }
 function boxBlur(scl, tcl, w, h, r) {
 	for (var i = 0; i < scl.length; i++) tcl[i] = scl[i];

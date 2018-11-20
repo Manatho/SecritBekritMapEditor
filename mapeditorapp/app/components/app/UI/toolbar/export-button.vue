@@ -104,7 +104,7 @@ function mapMultiplier(heightmap, min, max, terrainwidth, multiplier, sigma) {
 	if (sigma > 0 && multiplier > 1) {
 		console.log(sigma, multiplier);
 
-		gaussBlur(multipliedMap, new Array(multipliedMap.length), imagesize, imagesize, sigma);
+		gaussBlur(multipliedMap, imagesize, imagesize, sigma);
 	}
 	return multipliedMap;
 }

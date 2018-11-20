@@ -52,6 +52,8 @@ export const Controller = {
 		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
 		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
 		//terrain = new Terrain(6, 250, 2, baselineheight, 0, 1000);
+		console.log("Hej", size, scale);
+
 		terrain = new Terrain(actualSize, indiceworldsize, indeiceSize, baselineheight, 0, 1000);
 		scaling = scale;
 
