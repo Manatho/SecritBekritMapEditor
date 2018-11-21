@@ -2,7 +2,7 @@ import { Tool, Options, Option } from "./tools";
 
 let strengthOption = new Option("strength", 5);
 let sizeOption = new Option("size", 5, 1);
-let raiseTool = new Tool("square", null, new Options([strengthOption], [sizeOption]));
+let raiseTool = new Tool("gauss", null, new Options([strengthOption], [sizeOption]));
 
 let averageTool = new Tool("", { brushscaler: averageBrush, tooling: average }, new Options([], [sizeOption.copy()]));
 

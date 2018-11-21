@@ -35,21 +35,10 @@ export const Controller = {
 	},
 	createNewTerrain(size, scale) {
 		let actualSize = size / scale;
-		let indiceSize = Math.min(actualSize, 128);
+		let indiceSize = findBestIndiceSize(128, actualSize);
+		let baselineheight = 150; //Meters
 		let indiceCount = actualSize / indiceSize;
 		let indiceworldsize = ((size / 1024) * 1000) / indiceCount;
-		let baselineheight = 150; //Meters
-
-		//Ensures proper splitting of the map as close to 128 as possible
-		if ((actualSize / indiceSize) % 1 != 0) {
-			let newIndiceSize = actualSize;
-
-			while (newIndiceSize > 128 && newIndiceSize % 1 == 0) {
-				newIndiceSize /= 2;
-			}
-			indiceSize = (newIndiceSize * 2) >> 0;
-		}
-
 		// 128 1024 -> 8
 		// 128 512 -> 4
 		// 128 256 -> 2
@@ -101,6 +90,20 @@ export const Controller = {
 		eventbus.$off(eventType, method);
 	}
 };
+
+function findBestIndiceSize(base, worldsize) {
+	let indiceSize = Math.min(worldsize, base);
+	//Ensures proper splitting of the map as close to 128 as possible
+	if ((worldsize / indiceSize) % 1 != 0) {
+		let newIndiceSize = worldsize;
+
+		while (newIndiceSize > base && newIndiceSize % 1 == 0) {
+			newIndiceSize /= 2;
+		}
+		indiceSize = (newIndiceSize * 2) >> 0;
+	}
+	return indiceSize;
+}
 
 export const ControllerEvents = {
 	Event_PNG_Data_Changed: "png-data-changed",

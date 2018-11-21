@@ -122,7 +122,51 @@ function defaultScaler(brushtype) {
 				}
 				return brush;
 			};
+		case "gauss":
+			return tool => {
+				let s = "";
+				let brush = [];
+				let center = tool.brushOptions.size.value / 2;
+				let sigma = center * 0.7;
+				if (tool.brushOptions.size.value % 2 == 0) {
+					center -= 0.5;
+				} else {
+					center >>= 0;
+				}
+
+				//let func = makeGaussian(1, center, center, sigma, sigma);
+				let func = makeQuadratic(1, sigma, center);
+				for (let y = 0; y < tool.brushOptions.size.value; y++) {
+					brush[y] = [];
+					for (let x = 0; x < tool.brushOptions.size.value; x++) {
+						brush[y][x] = func(x, y);
+						if (brush[y][x] < 0.01) {
+							brush[y][x] = 0;
+						}
+
+						s += brush[y][x].toFixed(2) + ",";
+					}
+					s += "\n";
+				}
+				console.log(s);
+
+				return brush;
+			};
 	}
+}
+window.gauss = defaultScaler("gauss");
+
+function makeQuadratic(amplitude, h, c) {
+	return function(amplitude, h, c, x, y) {
+		return -(Math.pow(x - c, 2) / (h * h) + Math.pow(y - c, 2) / (h * h)) + amplitude;
+	}.bind(null, amplitude, h, c);
+}
+
+function makeGaussian(amplitude, x0, y0, sigmaX, sigmaY) {
+	return function(amplitude, x0, y0, sigmaX, sigmaY, x, y) {
+		var exponent = -(Math.pow(x - x0, 2) / (2 * Math.pow(sigmaX, 2)) + Math.pow(y - y0, 2) / (2 * Math.pow(sigmaY, 2)));
+		return amplitude * Math.pow(Math.E, exponent);
+	}.bind(null, amplitude, x0, y0, sigmaX, sigmaY);
 }
 
 function defaultTooling(tool, toolableVertices, invert) {

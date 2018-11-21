@@ -23,11 +23,11 @@ module.exports = {
 			{ test: /\.scss$/, use: ["style-loader", "css-loader", "sass-loader"] },
 			{ test: /\.(tfm|png|jp(e*)g|svg)$/, use: ["file-loader"] },
 			{ test: /\.worker\.js$/, use: { loader: "worker-loader" } },
-			{ test: /\.(vert|frag)$/, use: 'raw-loader' }
+			{ test: /\.(vert|frag)$/, use: "raw-loader" }
 		]
 	},
 	plugins: [
-		new cleanWebPackPlugin(["docs"], { root: path.resolve(__dirname, "..") }),
+		//new cleanWebPackPlugin(["docs"], { root: path.resolve(__dirname, "..") }),
 		new HtmlWebpackPlugin({ title: "App", template: "index.html" }),
 		new webpack.HotModuleReplacementPlugin(),
 		new VueLoaderPlugin()

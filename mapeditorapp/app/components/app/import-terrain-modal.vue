@@ -138,7 +138,7 @@ export default {
 	},
 	data() {
 		return {
-			render: true,
+			render: false,
 			err: null,
 
 			//Settings
