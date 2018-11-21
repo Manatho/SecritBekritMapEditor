@@ -7,6 +7,7 @@
 <script>
 let Progressbar = require("../../progressbar.vue").default.controller;
 
+import { MyMath } from "../../../logic/MyMath.js";
 import { Controller } from "../../../logic/controller.js";
 import { gaussBlur } from "../../../logic/images/gaussianblur.js";
 import Worker from "worker-loader?inline=true!./pngworker.js";
@@ -64,14 +65,6 @@ export default {
 	}
 };
 
-function lerp(num, in_min, in_max, out_min, out_max) {
-	let lerped = ((num - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
-	if (lerped < out_min || lerped > out_max) {
-		return Math.max(Math.min(lerped, out_max), out_min);
-	}
-	return lerped;
-}
-
 function mapMultiplier(heightmap, min, max, terrainwidth, multiplier, sigma) {
 	let linesize = terrainwidth * multiplier + multiplier;
 	let multipliedMap = new Array(linesize * linesize);
@@ -88,7 +81,7 @@ function mapMultiplier(heightmap, min, max, terrainwidth, multiplier, sigma) {
 		for (let x = 0; x < multiplier; x++) {
 			for (let y = 0; y < multiplier; y++) {
 				if ((i + 1) % terrainwidth != 0 || x == 0) {
-					multipliedMap[index + x + linesize * y] = lerp(value, min, max, 0, 65535);
+					multipliedMap[index + x + linesize * y] = MyMath.lerp(value, min, max, 0, 65535);
 				} else {
 					multipliedMap[index + x + linesize * y] = null;
 				}

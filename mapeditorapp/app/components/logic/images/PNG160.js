@@ -29,18 +29,16 @@ class CRC {
 class PNG160 {
 	//VERY LIKELY TO HAVE PROBLEMS WITH THIRD PARTY IMAGES!
 	//TODO: change IDAT size after edit
-	static readPixelsOfPNG(pngdata, metaDataSet, read, options) {
-		options = options || {};
-		let data = options.override ? pngdata.slice() : pngdata;
-
+	static readPNGFile(data, metaDataSet, read) {
 		if (isPng(data)) {
 			let index = PNG160.PNG_HEADER.length;
 			//PNG properties from IHDR:
 			let width, height, bitdepth, colortype, filterType;
 			let alldata = new Uint8Array();
+			let earlyStop = false;
 
 			//Read file
-			while (index < data.length) {
+			while (index < data.length && !earlyStop) {
 				let dataLength = bytesToInt32(data, index, index + 4);
 				let chunktype = bytesToInt32(data, index + 4, index + 8);
 				let nextIndex = index + 12 + dataLength;
@@ -58,6 +56,11 @@ class PNG160 {
 						colortype = data[index + 17];
 						filterType = data[index + 19];
 						metaDataSet({ width: width, height: height, bitdepth: bitdepth, colortype: colortype, filterType: filterType });
+
+						//If read not set, no reason to continue
+						if (read == null) {
+							earlyStop = true;
+						}
 						break;
 					case bytesToInt32(PNG160.IDAT):
 						let nextChunktype = bytesToInt32(data, nextIndex + 4, nextIndex + 8);
@@ -132,7 +135,7 @@ class PNG160 {
 			  };
 
 		let image = {};
-		PNG160.readPixelsOfPNG(
+		PNG160.readPNGFile(
 			pngfile,
 			metadata => {
 				image.data = new Uint16Array(metadata.width * metadata.height);
@@ -145,6 +148,14 @@ class PNG160 {
 		);
 
 		return image;
+	}
+	static getImageHeader(pngfile) {
+		let header;
+		PNG160.readPNGFile(pngfile, metadata => {
+			header = metadata;
+		});
+
+		return header;
 	}
 
 	static createPNG(height, width, dataputter) {

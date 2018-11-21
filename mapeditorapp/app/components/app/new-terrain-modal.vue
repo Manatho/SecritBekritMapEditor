@@ -14,6 +14,7 @@
 					<div style="display:flex">
 						<h4>Scaling</h4>
 						<div class="info">
+							<span class="icon"></span>
 							<span class="tooltip"
 								>Terrain to pixel ratio: <br />
 								Trades precision for performance <br/>

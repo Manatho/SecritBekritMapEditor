@@ -7,11 +7,23 @@ html {
 }
 
 .info {
-	background: url("../icons/help.svg");
 	height: 1.4em;
 	width: 1.4em;
 	margin-top: -1px;
 	position: relative;
+	background-color: transparent;
+
+	.icon {
+		background-color: black;
+		-webkit-mask-image: url("../icons/help.svg");
+		mask-image: url("../icons/help.svg");
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 1.4em;
+		width: 1.4em;
+	}
+
 	.tooltip {
 		visibility: hidden;
 
