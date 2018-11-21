@@ -11,8 +11,9 @@
 						<div class="info">
 							<span class="tooltip"
 								>Terrain to pixel ratio: <br />
-								Trades precision for performance.</span
-							>
+								Trades precision for performance <br/>
+								(4 is a good starting point)
+							</span>
 						</div>
 					</div>
 					<div class="grid-container">
@@ -27,11 +28,11 @@
 					<div style="display:flex">
 						<div>
 							<label>Min:</label>
-							<input type="number" name="quantity" class="number-input" v-model="minheight" min="1" max="5" />
+							<input type="number" name="min" class="number-input" v-model="minheight" @keyup.enter="blur" @blur="onblur" />
 						</div>
 						<div>
 							<label>Max:</label>
-							<input type="number" name="quantity" class="number-input" v-model="maxheight" min="1" max="5" />
+							<input type="number" name="max" class="number-input" v-model="maxheight"  @keyup.enter="blur"  @blur="onblur" />
 						</div>
 					</div>
 				</div>
@@ -46,12 +47,16 @@
 
 <script>
 import { Controller } from "../logic/controller.js";
-import { PNG160 } from "./UI/toolbar/export-logic/libs/PNG160.js";
-import { gaussBlur } from "./UI/toolbar/export-logic/gaussianblur.js";
+import { PNG160 } from "../logic/images/PNG160.js";
+import { gaussBlur } from "../logic/images/gaussianblur.js";
 
 let file;
 let width;
 let height;
+
+let canvas;
+let ctx2;
+let ctx;
 
 export default {
 	methods: {
@@ -61,10 +66,12 @@ export default {
 			element.click();
 			element.onchange = event => {
 				file = element.files[0];
+				console.log(file);
+
 				this.fileimported = true;
-				let canvas = this.$refs.canvasImage;
-				let ctx2 = this.$refs.canvasOverlay.getContext("2d");
-				let ctx = canvas.getContext("2d");
+				canvas = this.$refs.canvasImage;
+				ctx2 = this.$refs.canvasOverlay.getContext("2d");
+				ctx = canvas.getContext("2d");
 				let img = new Image();
 
 				console.log(canvas.height, canvas.width);
@@ -80,15 +87,7 @@ export default {
 								width = img.width;
 								height = img.height;
 								ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-								let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-								for (var i = 0; i < imageData.data.length; i += 4) {
-									if (imageData.data[i] < 20 && imageData.data[i + 1] < 20 && imageData.data[i + 2] < 20) {
-										imageData.data[i + 1] = 150;
-										imageData.data[i + 2] = 255;
-										imageData.data[i + 3] = 100;
-									}
-								}
-								ctx2.putImageData(imageData, 0, 0);
+								updateWaterLevel(ctx, ctx2, 25);
 							};
 						}
 					};
@@ -101,23 +100,46 @@ export default {
 			let scale = this.selectedScale;
 			let binaryReader = new FileReader();
 			let data;
+			let self = this;
+
 			binaryReader.readAsArrayBuffer(file); // async call
 			binaryReader.onload = function() {
 				data = PNG160.getData(new Uint8Array(this.result));
+				if (scale > 1) {
+					data = lanczos(data, width, height, 1 / scale, 3);
+				}
 				let floatdata = new Array(data.length);
+
 				for (let i = 0; i < data.length; i++) {
-					floatdata[i] = lerp(data[i], 0, 65536, 0, 1000);
+					floatdata[i] = lerp(data[i], 0, 65536, self.minheight, self.maxheight);
 				}
 				console.log(floatdata);
 				window.cray = floatdata;
 				data = null;
-				Controller.createNewTerrain(width - 1, scale, 0, 1000);
+				Controller.createNewTerrain(width - 1, scale);
 				Controller.terrain.setHeights(floatdata);
 			};
 			this.render = false;
 		},
 		show() {
 			this.render = true;
+		},
+		onblur(event) {
+			let target = event.target;
+
+			if (target.name == "min") {
+				this.minheight = Math.max(0, this.minheight);
+			} else if (target.name == "max") {
+				this.maxheight = Math.min(1000, this.maxheight);
+			}
+			this.minheight = Math.min(this.minheight, this.maxheight);
+			let waterheight = Math.max(0, ((100 - this.minheight) / this.maxheight) * 255);
+			console.log(waterheight);
+
+			updateWaterLevel(ctx, ctx2, waterheight);
+		},
+		blur(event) {
+			event.target.blur();
 		}
 	},
 	data() {
@@ -125,12 +147,27 @@ export default {
 			Scales: [1, 2, 4, 8, 16, 32],
 			minheight: 0,
 			maxheight: 1000,
-			selectedScale: 1,
+			selectedScale: 4,
 			render: true,
 			fileimported: false
 		};
 	}
 };
+
+function updateWaterLevel(ctx, ctx2, waterHeight) {
+	let imageData = ctx.getImageData(0, 0, width, height);
+	for (var i = 0; i < imageData.data.length; i += 4) {
+		if (imageData.data[i] < waterHeight - 1 && imageData.data[i + 1] < waterHeight - 1 && imageData.data[i + 2] < waterHeight - 1) {
+			imageData.data[i + 1] = 150;
+			imageData.data[i + 2] = 255;
+			imageData.data[i + 3] = 100;
+		} else if (imageData.data[i] < waterHeight && imageData.data[i + 1] < waterHeight && imageData.data[i + 2] < waterHeight) {
+			imageData.data[i] = 255;
+			imageData.data[i + 3] = 255;
+		}
+	}
+	ctx2.putImageData(imageData, 0, 0);
+}
 
 function lerp(num, in_min, in_max, out_min, out_max) {
 	let lerped = ((num - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
@@ -174,6 +211,7 @@ canvas {
 
 .number-input {
 	font-family: $font;
+	color: $element-backgroundlight;
 	font-size: 13px;
 	margin: auto;
 	width: 48%;

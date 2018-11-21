@@ -1,4 +1,4 @@
-import { PNG160 } from "./libs/PNG160.js";
+import { PNG160 } from "../../../logic/images/PNG160";
 
 self.onmessage = function(e) {
 	postMessage(["Start", "Starting"]);

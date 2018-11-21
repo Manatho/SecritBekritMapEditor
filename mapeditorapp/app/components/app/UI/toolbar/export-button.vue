@@ -8,8 +8,8 @@
 let Progressbar = require("../../progressbar.vue").default.controller;
 
 import { Controller } from "../../../logic/controller.js";
-import { gaussBlur } from "./export-logic/gaussianblur.js";
-import Worker from "worker-loader?inline=true!./export-logic/pngworker.js";
+import { gaussBlur } from "../../../logic/images/gaussianblur.js";
+import Worker from "worker-loader?inline=true!./pngworker.js";
 
 export default {
 	methods: {

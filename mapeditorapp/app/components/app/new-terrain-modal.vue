@@ -14,7 +14,11 @@
 					<div style="display:flex">
 						<h4>Scaling</h4>
 						<div class="info">
-							<span class="tooltip">Terrain to pixel ratio: <br> Trades precision for performance.</span>
+							<span class="tooltip"
+								>Terrain to pixel ratio: <br />
+								Trades precision for performance <br/>
+								(4 is a good starting point)
+							</span>
 						</div>
 					</div>
 					<label class="container" v-for="scale in Scales">
@@ -47,7 +51,7 @@ export default {
 		return {
 			Scales: [1, 2, 4, 8, 16, 32],
 			Sizes: [1024, 2048, 3072, 4096, 5120, 6144],
-			selectedScale: 1,
+			selectedScale: 4,
 			selectedSize: 1024,
 			render: false
 		};
