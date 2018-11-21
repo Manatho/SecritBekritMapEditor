@@ -12,10 +12,22 @@ let waterMaterial = new THREE.MeshBasicMaterial({
 	opacity: 0.5
 });
 
-let planeMaterial = new THREE.MeshLambertMaterial({
-	color: 0xffffff,
-	side: THREE.FrontSide
+let textureLoader = new THREE.TextureLoader();
+let grassTexture = textureLoader.load(require('./terrainShader/textures/grass.jpg'))
+grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+let rockTexture = textureLoader.load(require('./terrainShader/textures/rocks.jpg'))
+rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
+
+let terrainUniforms = {
+    grassTexture: { type: "t", value: grassTexture},
+    rockTexture: { type: "t", value: rockTexture},
+};
+let terrainMaterial = new THREE.RawShaderMaterial({
+	uniforms: terrainUniforms,
+	vertexShader: require('./terrainShader/terrainShader.vert'),
+	fragmentShader: require('./terrainShader/terrainShader.frag'),
 });
+
 let planeWireMaterial = new THREE.MeshBasicMaterial({
 	color: 0x000000,
 	wireframe: true,
@@ -49,27 +61,27 @@ class Terrain {
 		for (let x = 0; x < indiceCount; x++) {
 			for (let z = 0; z < indiceCount; z++) {
 				let geometryClone = planeGeometry.clone();
-				let mesh = new THREE.Mesh(geometryClone, planeMaterial);
+				let mesh = new THREE.Mesh(geometryClone, terrainMaterial);
 				mesh.name = "mesh:x" + x + ":z" + z;
-				let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
-				grid.name = "grid:x" + x + ":z" + z;
+				// let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
+				// grid.name = "grid:x" + x + ":z" + z;
 
 				mesh.renderDepth = 0;
-				grid.renderDepth = 1;
+				// grid.renderDepth = 1;
 
 				mesh.rotation.x = -Math.PI / 2;
-				grid.rotation.x = -Math.PI / 2;
+				// grid.rotation.x = -Math.PI / 2;
 
 				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
 				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
 				mesh.position.y = baseline;
 
-				grid.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
-				grid.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
-				grid.position.y = baseline;
+				// grid.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				// grid.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				// grid.position.y = baseline;
 
 				this._meshes.push(mesh);
-				this._grid.push(grid);
+				// this._grid.push(grid);
 			}
 		}
 		setNeighbours(this._meshes, indiceCount);
