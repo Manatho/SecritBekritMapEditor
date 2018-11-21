@@ -13,19 +13,19 @@ let waterMaterial = new THREE.MeshBasicMaterial({
 });
 
 let textureLoader = new THREE.TextureLoader();
-let grassTexture = textureLoader.load(require('./terrainShader/textures/grass.jpg'))
+let grassTexture = textureLoader.load(require("./terrainShader/textures/grass.jpg"));
 grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-let rockTexture = textureLoader.load(require('./terrainShader/textures/rocks.jpg'))
+let rockTexture = textureLoader.load(require("./terrainShader/textures/rocks.jpg"));
 rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
 
 let terrainUniforms = {
-    grassTexture: { type: "t", value: grassTexture},
-    rockTexture: { type: "t", value: rockTexture},
+	grassTexture: { type: "t", value: grassTexture },
+	rockTexture: { type: "t", value: rockTexture }
 };
 let terrainMaterial = new THREE.RawShaderMaterial({
 	uniforms: terrainUniforms,
-	vertexShader: require('./terrainShader/terrainShader.vert'),
-	fragmentShader: require('./terrainShader/terrainShader.frag'),
+	vertexShader: require("./terrainShader/terrainShader.vert"),
+	fragmentShader: require("./terrainShader/terrainShader.frag")
 });
 
 let planeWireMaterial = new THREE.MeshBasicMaterial({
@@ -56,32 +56,22 @@ class Terrain {
 
 		this._indiceSize = indiceSize + 1;
 		this._meshes = [];
-		this._grid = [];
 
 		for (let x = 0; x < indiceCount; x++) {
 			for (let z = 0; z < indiceCount; z++) {
 				let geometryClone = planeGeometry.clone();
 				let mesh = new THREE.Mesh(geometryClone, terrainMaterial);
 				mesh.name = "mesh:x" + x + ":z" + z;
-				// let grid = new THREE.Mesh(geometryClone, planeWireMaterial);
-				// grid.name = "grid:x" + x + ":z" + z;
 
 				mesh.renderDepth = 0;
-				// grid.renderDepth = 1;
 
 				mesh.rotation.x = -Math.PI / 2;
-				// grid.rotation.x = -Math.PI / 2;
 
-				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
-				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
+				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2;
+				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2;
 				mesh.position.y = baseline;
 
-				// grid.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
-				// grid.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2; // - this.indiceWorlSize / 2;
-				// grid.position.y = baseline;
-
 				this._meshes.push(mesh);
-				// this._grid.push(grid);
 			}
 		}
 		setNeighbours(this._meshes, indiceCount);
@@ -90,10 +80,6 @@ class Terrain {
 	addToScene(scene) {
 		this._meshes.forEach(mesh => {
 			scene.add(mesh);
-		});
-
-		this._grid.forEach(grid => {
-			scene.add(grid);
 		});
 
 		scene.add(this._water);
@@ -107,15 +93,6 @@ class Terrain {
 			mesh.material.dispose();
 			mesh.material = null;
 			mesh = null;
-		});
-
-		this._grid.forEach(grid => {
-			scene.remove(grid);
-			grid.geometry.dispose();
-			grid.geometry = null;
-			grid.material.dispose();
-			grid.material = null;
-			grid = null;
 		});
 
 		scene.remove(this._water);
@@ -330,12 +307,6 @@ class Terrain {
 	}
 	static async load(file, progress) {
 		const terrain = await new Promise(function(resolve, reject) {
-			//var xhr = new XMLHttpRequest();
-			//xhr.open("GET", url, true);
-			//xhr.responseType = "blob";
-			//xhr.onload = function(e) {
-			//	if (this.status == 200) {
-			//let blob = this.response;
 			let reader = new FileReader();
 			reader.addEventListener("loadend", function() {
 				let buffer = pako.inflate(reader.result);
@@ -349,9 +320,6 @@ class Terrain {
 				resolve(terrain);
 			});
 			reader.readAsArrayBuffer(file);
-			//	}
-			//};
-			//xhr.send();
 		});
 		console.log(terrain);
 
