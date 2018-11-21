@@ -105,9 +105,7 @@ export default {
 			binaryReader.readAsArrayBuffer(file); // async call
 			binaryReader.onload = function() {
 				data = PNG160.getData(new Uint8Array(this.result));
-				if (scale > 1) {
-					data = lanczos(data, width, height, 1 / scale, 3);
-				}
+
 				let floatdata = new Array(data.length);
 
 				for (let i = 0; i < data.length; i++) {
