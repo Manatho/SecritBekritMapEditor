@@ -124,24 +124,27 @@ class PNG160 {
 			}
 		}
 	}
-	static getData(pngfile, dataconverter) {
+	static getRawImage(pngfile, dataconverter) {
 		dataconverter = dataconverter
 			? dataconverter
 			: value => {
 					return value;
 			  };
-		let data;
+
+		let image = {};
 		PNG160.readPixelsOfPNG(
 			pngfile,
 			metadata => {
-				data = new Uint16Array(metadata.width * metadata.height);
+				image.data = new Uint16Array(metadata.width * metadata.height);
+				image.height = metadata.height;
+				image.width = metadata.width;
 			},
 			(width, i, value) => {
-				data[i] = dataconverter(value);
+				image.data[i] = dataconverter(value);
 			}
 		);
 
-		return data;
+		return image;
 	}
 
 	static createPNG(height, width, dataputter) {

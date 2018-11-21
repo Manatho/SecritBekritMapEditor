@@ -4,9 +4,9 @@
 export function gaussBlur(source, w, h, r) {
 	let output = new Uint16Array(source.length);
 	var bxs = boxesForGauss(r, 3);
-	boxBlur(source, tcl, w, h, (bxs[0] - 1) / 2);
-	boxBlur(tcl, source, w, h, (bxs[1] - 1) / 2);
-	boxBlur(source, tcl, w, h, (bxs[2] - 1) / 2);
+	boxBlur(source, output, w, h, (bxs[0] - 1) / 2);
+	boxBlur(output, source, w, h, (bxs[1] - 1) / 2);
+	boxBlur(source, output, w, h, (bxs[2] - 1) / 2);
 }
 function boxBlur(scl, tcl, w, h, r) {
 	for (var i = 0; i < scl.length; i++) tcl[i] = scl[i];

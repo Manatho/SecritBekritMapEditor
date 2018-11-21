@@ -49,6 +49,7 @@
 import { Controller } from "../logic/controller.js";
 import { PNG160 } from "../logic/images/PNG160.js";
 import { gaussBlur } from "../logic/images/gaussianblur.js";
+import { ResampleLanczos } from "../logic/images/lanczos.js";
 
 let file;
 let width;
@@ -99,21 +100,29 @@ export default {
 		createTerrain() {
 			let scale = this.selectedScale;
 			let binaryReader = new FileReader();
-			let data;
 			let self = this;
 
 			binaryReader.readAsArrayBuffer(file); // async call
 			binaryReader.onload = function() {
-				data = PNG160.getData(new Uint8Array(this.result));
+				let image = PNG160.getRawImage(new Uint8Array(this.result));
+				let data = image.data;
+				let width = image.width;
+				let height = image.height;
 
+				if (scale > 1) {
+					let scaledwidth = ((image.width * (1 / scale)) >> 0) + 1;
+					let scaledheight = ((image.height * (1 / scale)) >> 0) + 1;
+
+					data = ResampleLanczos(data, width, height, scaledwidth, scaledheight, 5);
+				}
 				let floatdata = new Array(data.length);
 
 				for (let i = 0; i < data.length; i++) {
 					floatdata[i] = lerp(data[i], 0, 65536, self.minheight, self.maxheight);
 				}
-				console.log(floatdata);
-				window.cray = floatdata;
 				data = null;
+				window.cray = floatdata;
+
 				Controller.createNewTerrain(width - 1, scale);
 				Controller.terrain.setHeights(floatdata);
 			};
