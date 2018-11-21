@@ -5,3 +5,56 @@ html {
 	height: 100%;
 	background-color: #bab8b4;
 }
+
+.info {
+	height: 1.4em;
+	width: 1.4em;
+	margin-top: -1px;
+	position: relative;
+	background-color: transparent;
+
+	.icon {
+		background-color: black;
+		-webkit-mask-image: url("../icons/help.svg");
+		mask-image: url("../icons/help.svg");
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 1.4em;
+		width: 1.4em;
+	}
+
+	.tooltip {
+		visibility: hidden;
+
+		position: absolute;
+		width: 150px;
+		padding: 5px 0;
+		z-index: 1;
+		bottom: 125%;
+		left: 50%;
+		margin-left: -75px;
+
+		background-color: rgb(43, 43, 43);
+		border-radius: 6px;
+		border: 1px;
+
+		color: #fff;
+		font-size: 12px;
+		text-align: center;
+	}
+	.tooltip::after {
+		content: "";
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		margin-left: -10px;
+		border-width: 10px;
+		border-style: solid;
+		border-color: rgb(43, 43, 43) transparent transparent transparent;
+	}
+
+	&:hover .tooltip {
+		visibility: visible;
+	}
+}

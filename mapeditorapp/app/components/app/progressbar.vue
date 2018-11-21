@@ -3,7 +3,7 @@
         <div class="progressbar-modal-content">
 
             <div class="progressbar-border">
-                <div class="progressbar" v-bind:style="{width: progress + '%'}"></div>
+                <div v-show="progressVisible" class="progressbar" v-bind:style="{width: progress + '%'}"></div>
                 <div id="message" class="progressbar-message">{{message}}</div>
             </div>
         </div>
@@ -19,6 +19,7 @@ let ProgressbarController = {
 	start() {
 		vue.progress = 0;
 		vue.visible = true;
+		vue.progressVisible = false;
 	},
 	stop() {
 		vue.visible = false;
@@ -28,6 +29,10 @@ let ProgressbarController = {
 	},
 	set progress(progress) {
 		vue.progress = progress;
+		vue.progressVisible = true;
+	},
+	set progressVisible(visible) {
+		vue.progressVisible = visible;
 	},
 	get message() {
 		return vue.message;
@@ -42,6 +47,7 @@ export default {
 	data() {
 		return {
 			visible: false,
+			progressVisible: false,
 			progress: 40,
 			message: ""
 		};
