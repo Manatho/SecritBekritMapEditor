@@ -1,5 +1,6 @@
 varying mediump vec3 vNormal;
 varying mediump vec2 vUv;
+varying mediump vec3 vPosition;
 
 uniform sampler2D grassTexture;
 uniform sampler2D rockTexture;
@@ -19,8 +20,10 @@ void main() {
 
     lowp float slope = pow(dot(vNormal, vec3(0,0,1.0)), 2.0);
 
-    mediump vec4 grassColor = texture2D(grassTexture, vUv * vec2(10.00));
-    mediump vec4 rockColor = texture2D(rockTexture, vUv * vec2(10.00));
+    lowp float textureScale = 100.0;
+
+    mediump vec4 grassColor = texture2D(grassTexture, (vPosition.xy + vUv) / textureScale);
+    mediump vec4 rockColor = texture2D(rockTexture, (vPosition.xy + vUv) / textureScale);
     mediump vec4 slopeTexture = slope * grassColor + (1.0 - slope) * rockColor;
 
     gl_FragColor = (lightColor + ambientColor) * slopeTexture;
