@@ -17,10 +17,13 @@ let grassTexture = textureLoader.load(require("./terrainShader/textures/grass.jp
 grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
 let rockTexture = textureLoader.load(require("./terrainShader/textures/rocks.jpg"));
 rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
+let roughRocksTexture = textureLoader.load(require("./terrainShader/textures/rough_rocks.jpg"));
+roughRocksTexture.wrapS = roughRocksTexture.wrapT = THREE.RepeatWrapping;
 
 let terrainUniforms = {
 	grassTexture: { type: "t", value: grassTexture },
-	rockTexture: { type: "t", value: rockTexture }
+	rockTexture: { type: "t", value: rockTexture },
+	roughRocksTexture: { type: "t", value: roughRocksTexture }
 };
 let terrainMaterial = new THREE.RawShaderMaterial({
 	uniforms: terrainUniforms,
