@@ -1,5 +1,11 @@
 <template>
+<div>
 	<canvas ref="threejs"></canvas>
+	<div>
+		<div class="height-output">Height: <span class="height-number">{{toolCenteredVertex.y.toFixed(0)}}m</span></div>
+	</div>
+</div>
+	
 </template>
 
 <script>
@@ -101,14 +107,48 @@ export default {
 	mounted() {
 		setupThree(this.$refs.threejs);
 		window.scene = scene;
+	},
+	data() {
+		console.log(ToolEffect);
+
+		return {
+			toolCenteredVertex: ToolEffect.centeredVertex
+		};
 	}
 };
 </script>
 
 <style lang="scss">
+@import "../../../style/variables.scss";
 .Three {
 	display: block;
 	position: relative;
+}
+
+.height-output {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+
+	padding: 5px;
+	margin: 10px;
+
+	background-color: $element-background;
+	border: $element-border;
+	border-radius: 5px;
+	box-shadow: 0 1px 2px 0px rgba(0, 0, 0, 0.384);
+	font-family: $font;
+	font-size: 0.8em;
+	//font-weight: bold;
+}
+
+.height-number {
+	background-color: $element-backgroundlight;
+	//border: $element-border;
+	border-radius: 5px;
+	padding: 1px;
+	font-size: 1.1em;
+	font-weight: bold;
 }
 </style>
 

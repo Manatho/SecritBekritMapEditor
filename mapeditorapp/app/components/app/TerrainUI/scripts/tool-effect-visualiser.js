@@ -2,6 +2,7 @@ import { Controller } from "../../../logic/controller";
 let THREE = require("../../../../libs/threemin");
 
 export const ToolEffect = {
+	centeredVertex: { x: 0, y: 0, z: 0 },
 	init(scene, InputController, Camera) {
 		let MAX_POINTS = 500;
 		//Create outline geometry and mesh
@@ -33,9 +34,11 @@ export const ToolEffect = {
 			let ymax = Controller.tool.brush.length - 1;
 			let xmax = Controller.tool.brush[ymax].length - 1;
 
-			let vertex = vertices[(xmax / 2) >> 0][(ymax / 2) >> 0].getWorldPosition();
-			tooloutline.position.x = vertex.x;
-			tooloutline.position.z = vertex.z;
+			tooloutline.position.x = meshesAndVertices.pressedVertex.x;
+			tooloutline.position.z = meshesAndVertices.pressedVertex.z;
+			this.centeredVertex.x = meshesAndVertices.pressedVertex.x;
+			this.centeredVertex.y = meshesAndVertices.pressedVertex.y;
+			this.centeredVertex.z = meshesAndVertices.pressedVertex.z;
 
 			//TODO: find ways to clean the following up:
 			//Scans from each of the four sides in turn to
