@@ -156,7 +156,8 @@ class Terrain {
 			//Clicked face
 			let faceVerticesIndexes = [intersects[0].face.a, intersects[0].face.b, intersects[0].face.c];
 			let distance = Number.MAX_VALUE;
-			let closest = null;
+			let closestIndex = null;
+			let closetstVertex;
 
 			//Find closest vertex
 			faceVerticesIndexes.forEach(vertexIndex => {
@@ -167,8 +168,9 @@ class Terrain {
 				let newdistance = intersects[0].point.distanceTo(vertex);
 
 				if (newdistance < distance) {
-					closest = vertexIndex;
+					closestIndex = vertexIndex;
 					distance = newdistance;
+					closetstVertex = vertex;
 				}
 			});
 			let target = intersects[0].object;
@@ -182,8 +184,8 @@ class Terrain {
 
 			//Converts 1d index to 2d indexes for easier
 			let vertex2dIndex = {
-				y: (closest / this._indiceSize) >> 0,
-				x: closest % this._indiceSize
+				y: (closestIndex / this._indiceSize) >> 0,
+				x: closestIndex % this._indiceSize
 			};
 			//Center toolbrush around cursor
 			let brushOffset = {
@@ -253,6 +255,7 @@ class Terrain {
 			});
 
 			return {
+				pressedVertex: closetstVertex,
 				meshes: meshgeometriesToUpdate,
 				indexedVertices: indexedVertices
 			};

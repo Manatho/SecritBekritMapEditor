@@ -2,6 +2,7 @@ import { Controller } from "../../../logic/controller";
 let THREE = require("../../../../libs/threemin");
 
 export const ToolEffect = {
+	centeredVertex: { x: 0, y: 0, z: 0 },
 	init(scene, InputController, Camera) {
 		let MAX_POINTS = 500;
 		//Create outline geometry and mesh
@@ -22,8 +23,8 @@ export const ToolEffect = {
 			let mouse3D = new THREE.Vector2((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
 			let raycaster = new THREE.Raycaster();
 			raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
-
 			let meshesAndVertices = Controller.terrain.getAffectedMeshesAndVertices(raycaster, Controller.tool.brush);
+
 			if (!meshesAndVertices) return;
 
 			let vertices = meshesAndVertices.indexedVertices;
@@ -32,6 +33,12 @@ export const ToolEffect = {
 			let outline = [];
 			let ymax = Controller.tool.brush.length - 1;
 			let xmax = Controller.tool.brush[ymax].length - 1;
+
+			tooloutline.position.x = meshesAndVertices.pressedVertex.x;
+			tooloutline.position.z = meshesAndVertices.pressedVertex.z;
+			this.centeredVertex.x = meshesAndVertices.pressedVertex.x;
+			this.centeredVertex.y = meshesAndVertices.pressedVertex.y;
+			this.centeredVertex.z = meshesAndVertices.pressedVertex.z;
 
 			//TODO: find ways to clean the following up:
 			//Scans from each of the four sides in turn to
@@ -77,9 +84,9 @@ export const ToolEffect = {
 				let x = corner.x;
 				if (vertices[y] && vertices[y][x]) {
 					let vertex = vertices[y][x].getWorldPosition();
-					positions[index++] = vertex.x;
+					positions[index++] = vertex.x - tooloutline.position.x;
 					positions[index++] = vertex.y;
-					positions[index++] = vertex.z;
+					positions[index++] = vertex.z - tooloutline.position.z;
 				}
 			});
 
