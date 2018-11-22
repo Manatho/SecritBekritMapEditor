@@ -5,7 +5,8 @@
 				<div style="float:right; position:absoulte"> 
 					<div class="info">
 						<span class="icon"></span>
-						<span class="tooltip">Imported images need to be 16bit grayscale pngs</span>
+						<span class="tooltip">Imported images need to be 16bit grayscale pngs </br></br>
+						(Currently, non-square maps and incorrect sizes are not supported</span>
 					</div>
 				</div>
 			</div>
@@ -25,7 +26,7 @@
 					</div>
 					<div class="grid-container">
 						<label class="container" v-for="scale in Scales">
-							<input type="radio" name="scale" class="radioinput" v-model="selectedScale" v-bind:value="scale" />
+							<input type="radio" name="importscale" class="radioinput" v-model="selectedScale" v-bind:value="scale" />
 							<span class="radio"></span> <span class="radiotext">{{ scale }}</span>
 						</label>
 					</div>
@@ -35,11 +36,11 @@
 					<div style="display:flex">
 						<div>
 							<label>Min:</label>
-							<input type="number" name="min" class="number-input" v-model="minheight" @keyup.enter="blur" @blur="onblur" />
+							<input type="number" name="importmin" class="number-input" v-model="minheight" @keyup.enter="blur" @blur="onblur" />
 						</div>
 						<div>
 							<label>Max:</label>
-							<input type="number" name="max" class="number-input" v-model="maxheight"  @keyup.enter="blur"  @blur="onblur" />
+							<input type="number" name="importmax" class="number-input" v-model="maxheight"  @keyup.enter="blur"  @blur="onblur" />
 						</div>
 					</div>
 				</div>
@@ -68,8 +69,6 @@ export default {
 	methods: {
 		uploadTerrain() {
 			openFileDialog(file => {
-				console.log(file.type);
-
 				if (file.type != "image/png") {
 					this.err = "Not a png";
 					return;
@@ -122,9 +121,9 @@ export default {
 		onblur(event) {
 			let target = event.target;
 
-			if (target.name == "min") {
+			if (target.name == "importmin") {
 				this.minheight = Math.max(0, this.minheight);
-			} else if (target.name == "max") {
+			} else if (target.name == "importmax") {
 				this.maxheight = Math.min(1000, this.maxheight);
 			}
 			this.minheight = Math.min(this.minheight, this.maxheight);
@@ -205,16 +204,21 @@ function checkImageType(self, file) {
 		self.rawImageData = new Uint8Array(this.result);
 		let header = PNG160.getImageHeader(self.rawImageData);
 		if (header.bitdepth == 16 && header.colortype == 0) {
-			self.fileimported = true;
-			self.err = null;
+			if (header.width != header.height) {
+				self.err = "Not square";
+				self.fileimported = false;
+			} else if ((header.width - 1) % 1024 != 0) {
+				self.err = "Not a multiple of 1024(+1)";
+				self.fileimported = false;
+			} else {
+				self.fileimported = true;
+				self.err = null;
+			}
 		} else {
 			self.err = "Not 16bit / grayscale";
 			self.fileimported = false;
 		}
 		Progressbar.stop();
-	};
-	binaryReader.onprogress = function(event) {
-		console.log(event);
 	};
 }
 </script>
@@ -274,7 +278,7 @@ canvas {
 .err {
 	width: calc(100% - 27px);
 
-	font-size: 0.9em;
+	font-size: 0.8em;
 	color: rgb(255, 223, 223);
 	border: rgb(90, 12, 12) 1px solid;
 	background-color: rgb(136, 62, 62);

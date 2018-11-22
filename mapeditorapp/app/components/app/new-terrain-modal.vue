@@ -5,7 +5,7 @@
 				<div class="setting">
 					<h4>Size</h4>
 					<label class="container" v-for="size in Sizes">
-  						<input type="radio" name="size" class="radioinput" v-model="selectedSize" v-bind:value="size">
+  						<input type="radio" name="newsize" class="radioinput" v-model="selectedSize" v-bind:value="size">
 						  <span class="radio"></span>
   						<span class="radiotext">{{size}}</span>
 					</label>
@@ -23,7 +23,7 @@
 						</div>
 					</div>
 					<label class="container" v-for="scale in Scales">
-  						<input type="radio" name="scale" class="radioinput" v-model="selectedScale" v-bind:value="scale">
+  						<input type="radio" name="newscale" class="radioinput" v-model="selectedScale" v-bind:value="scale">
 						<span class="radio"></span>
   						<span class="radiotext">{{scale}}</span>
 					</label>
@@ -54,7 +54,7 @@ export default {
 			Sizes: [1024, 2048, 3072, 4096, 5120, 6144],
 			selectedScale: 4,
 			selectedSize: 1024,
-			render: false
+			render: true
 		};
 	}
 };
