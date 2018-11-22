@@ -124,7 +124,6 @@ function defaultScaler(brushtype) {
 			};
 		case "gauss":
 			return tool => {
-				let s = "";
 				let brush = [];
 				let center = tool.brushOptions.size.value / 2;
 				let sigma = center * 0.7;
@@ -135,7 +134,7 @@ function defaultScaler(brushtype) {
 				}
 
 				//let func = makeGaussian(1, center, center, sigma, sigma);
-				let func = makeQuadratic(1, sigma, center);
+				let func = makeQuadratic(1.4, sigma, center);
 				for (let y = 0; y < tool.brushOptions.size.value; y++) {
 					brush[y] = [];
 					for (let x = 0; x < tool.brushOptions.size.value; x++) {
@@ -143,12 +142,8 @@ function defaultScaler(brushtype) {
 						if (brush[y][x] < 0.01) {
 							brush[y][x] = 0;
 						}
-
-						s += brush[y][x].toFixed(2) + ",";
 					}
-					s += "\n";
 				}
-				console.log(s);
 
 				return brush;
 			};

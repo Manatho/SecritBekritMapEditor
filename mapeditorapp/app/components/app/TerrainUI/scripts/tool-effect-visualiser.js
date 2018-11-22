@@ -13,7 +13,7 @@ export const ToolEffect = {
 		tooloutline.position.y = 20;
 		scene.add(tooloutline);
 
-		InputController.add("mousemove", event => {
+		InputController.add("mousemove", (event, rerender) => {
 			if (Controller.terrain == null) {
 				return;
 			}
@@ -85,6 +85,7 @@ export const ToolEffect = {
 
 			tooloutline.geometry.attributes.position.needsUpdate = true;
 			tooloutline.geometry.setDrawRange(0, outline.length);
+			rerender();
 		});
 	}
 };

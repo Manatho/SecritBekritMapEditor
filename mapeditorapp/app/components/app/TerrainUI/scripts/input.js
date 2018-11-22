@@ -13,10 +13,6 @@ let Controller = {
 
 	add: (actionType, action, opts) => {
 		_actions[actionType].methods.push(action);
-
-		if (opts && opts["render"]) {
-			_actions[actionType].render = opts.render;
-		}
 	},
 	remove(actionType, action) {
 		let index = _actions[actionType].methods.indexOf(action);
@@ -31,10 +27,7 @@ let Controller = {
 				event => {
 					if (!event.type.includes("mouse") || event.path[0].nodeName == "CANVAS") {
 						_actions[actionKey].methods.forEach(method => {
-							method(event);
-							if (_actions[actionKey].render) {
-								requestRender();
-							}
+							method(event, requestRender);
 						});
 					} else {
 						Controller.isMouseDown = false;
@@ -46,20 +39,12 @@ let Controller = {
 	}
 };
 
-Controller.add(
-	"mousedown",
-	event => {
-		Controller.mouseDownEvent = event;
-		Controller.isMouseDown = true;
-	},
-	{ render: true }
-);
-Controller.add(
-	"mouseup",
-	() => {
-		Controller.isMouseDown = false;
-	},
-	{ render: true }
-);
+Controller.add("mousedown", event => {
+	Controller.mouseDownEvent = event;
+	Controller.isMouseDown = true;
+});
+Controller.add("mouseup", () => {
+	Controller.isMouseDown = false;
+});
 
 export { Controller };
