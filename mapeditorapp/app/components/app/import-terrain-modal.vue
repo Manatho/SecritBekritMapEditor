@@ -12,6 +12,7 @@
 			</div>
 			<button @click="uploadTerrain" class="button">Import</button>
 			<div v-show="fileimported" style="width: 100%; display:flex; flex-direction:column;">
+				<input class="textinput" v-model="name" name="importName" placeholder="Name" @keyup.enter="blur" @keypress="onkey">
 				<div class="canvas-container"><canvas ref="canvasImage"></canvas> <canvas ref="canvasOverlay"></canvas></div>
 				<div class="setting">
 					<div style="display:flex">
@@ -103,8 +104,8 @@ export default {
 					floatdata[i] = MyMath.lerp(data[i], 0, 65536, this.minheight, this.maxheight);
 				}
 				data = null;
-
-				Controller.createNewTerrain(image.width - 1, this.selectedScale);
+				let name = this.name == "" ? "map" : this.name;
+				Controller.createNewTerrain(name, image.width - 1, this.selectedScale);
 				Controller.terrain.setHeights(floatdata);
 				this.render = false;
 				Progressbar.stop();
@@ -133,6 +134,14 @@ export default {
 		},
 		blur(event) {
 			event.target.blur();
+		},
+		onkey(event) {
+			let key = event.key;
+
+			if ((this.name == "" && key.match(/[a-zA-Z]/g)) || (this.name != "" && key.match(/^[\w\-. ]+$/g))) {
+				return true;
+			}
+			event.preventDefault();
 		}
 	},
 	data() {
@@ -145,6 +154,7 @@ export default {
 			minheight: 0,
 			maxheight: 1000,
 			selectedScale: 4,
+			name: "",
 
 			//Canvas
 			canvas: null,
@@ -176,7 +186,9 @@ function updateWaterLevel(canvas, layer1, layer2, waterHeight) {
 function openFileDialog(callback) {
 	let element = document.createElement("input");
 	element.setAttribute("type", "file");
-	element.click();
+	setTimeout(function() {
+		element.click();
+	}, 0);
 	element.onchange = event => {
 		callback(element.files[0]);
 	};

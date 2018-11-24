@@ -26,9 +26,11 @@ let Controller = {
 				actionKey,
 				event => {
 					if (!event.type.includes("mouse") || event.path[0].nodeName == "CANVAS") {
-						_actions[actionKey].methods.forEach(method => {
-							method(event, requestRender);
-						});
+						if (document.activeElement.nodeName == "BODY") {
+							_actions[actionKey].methods.forEach(method => {
+								method(event, requestRender);
+							});
+						}
 					} else {
 						Controller.isMouseDown = false;
 					}

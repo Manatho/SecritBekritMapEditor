@@ -58,7 +58,9 @@ export default {
 							action: () => {
 								let element = document.createElement("input");
 								element.setAttribute("type", "file");
-								element.click();
+								setTimeout(function() {
+									element.click();
+								}, 0);
 								element.onchange = file => {
 									Controller.loadTerrain(element.files[0]);
 								};
