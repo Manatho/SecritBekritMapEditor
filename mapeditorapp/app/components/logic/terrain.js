@@ -251,7 +251,7 @@ class Terrain {
 						element.vertex,
 						element.mesh,
 						this.min - this.baseline,
-						this.max
+						this.max - this.baseline
 					);
 				}
 				indexedVertices[element.index.y][element.index.x]._vertices.push(element.vertex);

@@ -36,6 +36,7 @@ export const ToolEffect = {
 
 			tooloutline.position.x = meshesAndVertices.pressedVertex.x;
 			tooloutline.position.z = meshesAndVertices.pressedVertex.z;
+			tooloutline.position.y = meshesAndVertices.pressedVertex.y;
 			this.centeredVertex.x = meshesAndVertices.pressedVertex.x;
 			this.centeredVertex.y = meshesAndVertices.pressedVertex.y;
 			this.centeredVertex.z = meshesAndVertices.pressedVertex.z;
@@ -85,7 +86,7 @@ export const ToolEffect = {
 				if (vertices[y] && vertices[y][x]) {
 					let vertex = vertices[y][x].getWorldPosition();
 					positions[index++] = vertex.x - tooloutline.position.x;
-					positions[index++] = vertex.y;
+					positions[index++] = vertex.y - tooloutline.position.y + 20;
 					positions[index++] = vertex.z - tooloutline.position.z;
 				}
 			});
