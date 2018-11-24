@@ -36,15 +36,19 @@ let planeWireMaterial = new THREE.MeshBasicMaterial({
 });
 
 class Terrain {
-	constructor(mapsize, indiceworldsize, indiceSize, baseline, min, max) {
+	static get PIXEL_PER_METER() {
+		return PIXEL_PER_METER;
+	}
+	constructor(name, mapsize, indiceworldsize, indiceSize, baseline, min, max) {
+		this.name = name;
 		this.mapSize = mapsize;
-		this.indiceWorlSize = indiceworldsize * PIXEL_PER_METER;
+		this.indiceWorldSize = indiceworldsize * PIXEL_PER_METER;
 		this.min = Math.max(0, min);
 		this.baseline = Math.max(baseline, this.min);
 		this.max = max;
 
 		let indiceCount = this.mapSize / indiceSize;
-		let waterGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize * indiceCount, this.indiceWorlSize * indiceCount, 1, 1);
+		let waterGeometry = new THREE.PlaneBufferGeometry(this.indiceWorldSize * indiceCount, this.indiceWorldSize * indiceCount, 1, 1);
 
 		this._water = new THREE.Mesh(waterGeometry, waterMaterial);
 		this._water.name = "Water";
@@ -52,7 +56,7 @@ class Terrain {
 		this._water.rotation.x = -Math.PI / 2;
 		this._water.position.y = 99.8;
 
-		let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorlSize, this.indiceWorlSize, indiceSize, indiceSize);
+		let planeGeometry = new THREE.PlaneBufferGeometry(this.indiceWorldSize, this.indiceWorldSize, indiceSize, indiceSize);
 
 		this._indiceSize = indiceSize + 1;
 		this._meshes = [];
@@ -67,8 +71,8 @@ class Terrain {
 
 				mesh.rotation.x = -Math.PI / 2;
 
-				mesh.position.x = this.indiceWorlSize * x - (this.indiceWorlSize * (indiceCount - 1)) / 2;
-				mesh.position.z = this.indiceWorlSize * z - (this.indiceWorlSize * (indiceCount - 1)) / 2;
+				mesh.position.x = this.indiceWorldSize * x - (this.indiceWorldSize * (indiceCount - 1)) / 2;
+				mesh.position.z = this.indiceWorldSize * z - (this.indiceWorldSize * (indiceCount - 1)) / 2;
 				mesh.position.y = baseline;
 
 				this._meshes.push(mesh);
@@ -114,8 +118,8 @@ class Terrain {
 
 				//Transform to globalspace, map to indexes and set minimum at (0,0)
 				//(500,-500) -> (1,-1) -> (2,0)
-				pos.x = (pos.x + vertex.x) / (this.indiceWorlSize / indice) + this.mapSize / 2;
-				pos.z = (pos.z - vertex.y) / (this.indiceWorlSize / indice) + this.mapSize / 2;
+				pos.x = (pos.x + vertex.x) / (this.indiceWorldSize / indice) + this.mapSize / 2;
+				pos.z = (pos.z - vertex.y) / (this.indiceWorldSize / indice) + this.mapSize / 2;
 
 				pos.x = Math.round(pos.x);
 				pos.z = Math.round(pos.z);
@@ -278,15 +282,15 @@ class Terrain {
 		test.set(heightdata);
 		let bytes = new Uint8Array(buffer);
 
-		console.log(test);
 		heightdata = pako.deflate(bytes, { level: 9, windowBits: 8, strategy: 1 });
 
 		let savedTerrain = {
+			name: this.name,
 			min: this.min,
 			max: this.max,
 			baseline: this.baseline,
 			mapsize: this.mapSize,
-			indiceWorldSize: this.indiceWorlSize / PIXEL_PER_METER,
+			indiceWorldSize: this.indiceWorldSize / PIXEL_PER_METER,
 			indiceSize: this._indiceSize - 1,
 			heightData: heightdata
 		};
@@ -300,11 +304,10 @@ class Terrain {
 
 		let element = document.createElement("a");
 		element.setAttribute("href", url);
-		element.setAttribute("download", "Terrain.tfm");
+		element.setAttribute("download", this.name + ".tfm");
 		element.style.display = "none";
-		document.body.appendChild(element);
 		element.click();
-		document.body.removeChild(element);
+		element = null;
 
 		console.log("Done");
 	}
@@ -318,13 +321,12 @@ class Terrain {
 				let ts = JSON.parse(text);
 				ts.heightData = new Float64Array(pako.inflate(ts.heightData).buffer);
 
-				let terrain = new Terrain(ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
+				let terrain = new Terrain(ts.name, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
 				terrain.setHeights(ts.heightData);
 				resolve(terrain);
 			});
 			reader.readAsArrayBuffer(file);
 		});
-		console.log(terrain);
 
 		return terrain;
 	}

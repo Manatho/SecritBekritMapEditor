@@ -1,6 +1,7 @@
 <template>
 	<div v-show="render" class="modal">
 		<div class="modal-content">
+			<input class="textinput" v-model="name" name="newName" placeholder="Name" @keyup.enter="blur" @keypress="onkey">
 			<div class="settings">
 				<div class="setting">
 					<h4>Size</h4>
@@ -41,11 +42,23 @@ import { Controller } from "../logic/controller.js";
 export default {
 	methods: {
 		createTerrain() {
-			Controller.createNewTerrain(this.selectedSize, this.selectedScale);
+			let name = this.name == "" ? "map" : this.name;
+			Controller.createNewTerrain(name, this.selectedSize, this.selectedScale);
 			this.render = false;
 		},
 		show() {
 			this.render = true;
+		},
+		blur(event) {
+			event.target.blur();
+		},
+		onkey(event) {
+			let key = event.key;
+
+			if ((this.name == "" && key.match(/[a-zA-Z]/g)) || (this.name != "" && key.match(/^[\w\-. ]+$/g))) {
+				return true;
+			}
+			event.preventDefault();
 		}
 	},
 	data() {
@@ -54,6 +67,7 @@ export default {
 			Sizes: [1024, 2048, 3072, 4096, 5120, 6144],
 			selectedScale: 4,
 			selectedSize: 1024,
+			name: "",
 			render: true
 		};
 	}

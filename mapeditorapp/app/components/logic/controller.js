@@ -33,26 +33,14 @@ export const Controller = {
 	get scaling() {
 		return scaling;
 	},
-	createNewTerrain(size, scale) {
+	createNewTerrain(name, size, scale) {
 		let actualSize = size / scale;
 		let indiceSize = findBestIndiceSize(128, actualSize);
 		let baselineheight = 150; //Meters
 		let indiceCount = actualSize / indiceSize;
 		let indiceworldsize = ((size / 1024) * 1000) / indiceCount;
-		// 128 1024 -> 8
-		// 128 512 -> 4
-		// 128 256 -> 2
-		// 128 128 -> 1
 
-		// this.mapSize = 4096; this.indiceWorlSize = 8000; var indiceSize = 128;
-		// this.mapSize = 2048; this.indiceWorlSize = 4000; var indiceSize = 128;
-		// this.mapSize = 1024; this.indiceWorlSize = 2000; let indiceSize = 128;
-		// this.mapSize = 512; this.indiceWorlSize = 1000; var indiceSize = 64;
-		// this.mapSize = 256; this.indiceWorlSize = 500; var indiceSize = 32;
-		// this.mapSize = 4; this.indiceWorlSize = 1000; var indiceSize = 2;
-		//terrain = new Terrain(6, 250, 2, baselineheight, 0, 1000);
-
-		terrain = new Terrain(actualSize, indiceworldsize, indiceSize, baselineheight, 0, 1000);
+		terrain = new Terrain(name, actualSize, indiceworldsize, indiceSize, baselineheight, 0, 1000);
 		scaling = scale;
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
@@ -60,6 +48,13 @@ export const Controller = {
 	},
 	async loadTerrain(file, progress) {
 		terrain = await Terrain.load(file, progress);
+
+		console.log(terrain.mapSize, terrain._indiceSize, terrain.indiceWorldSize, Terrain.PIXEL_PER_METER);
+
+		scaling = (128 * (terrain.mapSize / (terrain._indiceSize - 1)) * terrain.indiceWorldSize) / (125 * terrain.mapSize);
+		scaling /= Terrain.PIXEL_PER_METER;
+		console.log(scaling);
+
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
 	},
 	saveTerrain() {

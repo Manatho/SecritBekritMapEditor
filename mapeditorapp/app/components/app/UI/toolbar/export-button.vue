@@ -12,6 +12,9 @@ import { Controller } from "../../../logic/controller.js";
 import { gaussBlur } from "../../../logic/images/gaussianblur.js";
 import Worker from "worker-loader?inline=true!./pngworker.js";
 
+import * as JSZip from "jszip";
+import { create } from "../../../logic/createLuaFile.js";
+
 export default {
 	methods: {
 		exportMap: event => {
@@ -56,6 +59,30 @@ export default {
 						case "Data":
 							Controller.pngData = e.data[1];
 							Progressbar.stop();
+
+							let mapname = Controller.terrain.name;
+
+							let zip = new JSZip();
+							zip.file(
+								"instructions.txt",
+								'To add your map to TransportFever move the folder "' +
+									mapname +
+									'" into the map folder of the game. \r\n\r\nThe TransportFever map folder can be found by going to your: \r\nSteam Library -> right clicking TransportFever -> Properties -> Local Files -> Browse Local Files  \r\n\r\nEnjoy! :)'
+							);
+							zip.folder(mapname);
+							zip.file(mapname + "/map.lua", create({ name: mapname }));
+							zip.file(mapname + "/heightmap.png", Controller.pngData, { binary: true });
+
+							zip.generateAsync({ type: "blob" }).then(function(blob) {
+								let url = URL.createObjectURL(blob);
+								let element = document.createElement("a");
+								element.setAttribute("href", url);
+								element.setAttribute("download", "Map.zip");
+								element.click();
+								element = null;
+								URL.revokeObjectURL(url);
+							});
+
 							break;
 					}
 				};
@@ -93,10 +120,7 @@ function mapMultiplier(heightmap, min, max, terrainwidth, multiplier, sigma) {
 	multipliedMap = multipliedMap.filter((h, i) => h != null);
 	multipliedMap = multipliedMap.slice(0, multipliedMap.length - imagesize * (multiplier - 1));
 
-	console.log(sigma, multiplier);
 	if (sigma > 0 && multiplier > 1) {
-		console.log(sigma, multiplier);
-
 		gaussBlur(multipliedMap, imagesize, imagesize, sigma);
 	}
 	return multipliedMap;
