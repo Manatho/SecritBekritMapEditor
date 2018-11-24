@@ -186,7 +186,7 @@ function updateWaterLevel(canvas, layer1, layer2, waterHeight) {
 function openFileDialog(callback) {
 	let element = document.createElement("input");
 	element.setAttribute("type", "file");
-	setTimeout(() => {
+	setTimeout(function() {
 		element.click();
 	}, 0);
 	element.onchange = event => {
