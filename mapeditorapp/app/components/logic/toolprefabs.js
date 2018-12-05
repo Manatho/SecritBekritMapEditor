@@ -48,6 +48,7 @@ function averageBrush(tool) {
 }
 
 let townTool = new Tool("", { brushscaler: townBrush, tooling: towner });
+townTool.name = "town";
 function townBrush() {
 	return [[1]];
 }

@@ -6,32 +6,32 @@ class Town {
 		this.sizeFactor = sizeFactor;
 		this.type = "TOWN";
 
-		let material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+		let material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true });
 		let geometry = new THREE.BoxGeometry(100, 100, 100);
-		this._townMesh = new THREE.Mesh(geometry, material);
-		this._townMesh.position.x = position.x;
-		this._townMesh.position.y = position.y;
-		this._townMesh.position.z = position.z;
+		this.mesh = new THREE.Mesh(geometry, material);
+		this.mesh.position.x = position.x;
+		this.mesh.position.y = position.y;
+		this.mesh.position.z = position.z;
 	}
-	set type(invalid) {}
 	set position(newPosition) {
-		this._townMesh.position = newPosition;
+		this.mesh.position = newPosition;
 	}
 
 	get position() {
-		return this._townMesh.position;
+		return this.mesh.position;
 	}
 
 	addToScene(scene) {
-		scene.add(this._townMesh);
+		scene.add(this.mesh);
 	}
 
 	removeFromScene(scene) {
-		this._townMesh.geometry.dispose();
-		this._townMesh.geometry = null;
-		this._townMesh.material.dispose();
-		this._townMesh.material = null;
-		this._townMesh = null;
+		scene.remove(this.mesh);
+		this.mesh.geometry.dispose();
+		this.mesh.geometry = null;
+		this.mesh.material.dispose();
+		this.mesh.material = null;
+		this.mesh = null;
 	}
 }
 
