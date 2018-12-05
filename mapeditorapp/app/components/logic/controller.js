@@ -1,13 +1,13 @@
 import Vue from "vue";
 import { Terrain } from "./terrain";
-import { raiseTool, averageTool } from "./toolprefabs";
+import { raiseTool, averageTool, townTool } from "./toolprefabs";
 
 let eventbus = new Vue();
 
 let terrain;
 let scaling = 1;
 
-let tools = [raiseTool, averageTool];
+let tools = [raiseTool, averageTool, townTool];
 let tool = tools[0];
 
 let pngdata;

@@ -45,4 +45,17 @@ function averageBrush(tool) {
 	return brush;
 }
 
-export { raiseTool, averageTool };
+let townTool = new Tool("", { brushscaler: townBrush, tooling: towner });
+function townBrush() {
+	return [[1]];
+}
+
+let lastTownTool = 0;
+function towner(tool, toolableVertices) {
+	if (lastTownTool + 1000 < Date.now()) {
+		console.log(tool, toolableVertices);
+		lastTownTool = Date.now();
+	}
+}
+
+export { raiseTool, averageTool, townTool };

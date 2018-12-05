@@ -56,6 +56,10 @@ export class Options {
 
 export class Tool {
 	constructor(brushtype, methods, options) {
+		if (options == null) {
+			options = new Options([], []);
+		}
+
 		this.options = options.all;
 
 		this.toolOptions = options.tools;
