@@ -2,7 +2,7 @@ import { Tool, Options, Option } from "./tools";
 import { Controller } from "./controller";
 import { Town } from "./TerrainObjects/town";
 
-let strengthOption = new Option("strength", 5);
+let strengthOption = new Option("strength", 1);
 let sizeOption = new Option("size", 5, 1);
 let raiseTool = new Tool("gauss", null, new Options([strengthOption], [sizeOption]));
 
@@ -59,7 +59,7 @@ function towner(tool, toolableVertices) {
 		if (toolableVertices.length > 0) {
 			//console.log();
 
-			Controller.addTerrainObject(new Town("Hej", toolableVertices[0][0].getWorldPosition(), 1));
+			Controller.addTerrainObject(new Town("Hej", toolableVertices[0][0], 1));
 		}
 	}
 }

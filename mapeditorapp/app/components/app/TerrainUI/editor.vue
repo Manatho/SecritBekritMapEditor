@@ -38,8 +38,6 @@ function setupToolApply() {
         );
 
         if (Controller.tool.name == "town") {
-            console.log("HejHej", townIntersect.length, event.button);
-
             if (townIntersect.length == 0 && event.button == 0) {
                 raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
                 Controller.applyTool(raycaster, event.button);
@@ -52,8 +50,11 @@ function setupToolApply() {
 
             let test = setInterval(() => {
                 if (InputController.isMouseDown) {
-                    raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
-                    Controller.applyTool(raycaster, event.button);
+                    if (event.button != 1) {
+                        raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
+                        Controller.applyTool(raycaster, event.button);
+                        Controller.terrain.terrainObjects.updatePosition();
+                    }
                 } else {
                     clearInterval(test);
                 }

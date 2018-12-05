@@ -17,6 +17,11 @@ class TerrainObjects {
 			arrayRemove(this.meshes, object.mesh);
 		}
 	}
+	updatePosition() {
+		this.towns.forEach(town => {
+			town.updatePosition();
+		});
+	}
 }
 
 function arrayRemove(array, element) {
