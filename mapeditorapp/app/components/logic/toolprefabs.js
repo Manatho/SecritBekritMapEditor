@@ -1,9 +1,9 @@
-import { Tool, Options, Option } from "./tools";
+import { Tool, Options, NumberOption, TextOption } from "./tools";
 import { Controller } from "./controller";
 import { Town } from "./TerrainObjects/town";
 
-let strengthOption = new Option("strength", 1);
-let sizeOption = new Option("size", 5, 1);
+let strengthOption = new NumberOption("strength", 1);
+let sizeOption = new NumberOption("size", 5, 1);
 let raiseTool = new Tool("gauss", null, new Options([strengthOption], [sizeOption]));
 
 let averageTool = new Tool("", { brushscaler: averageBrush, tooling: average }, new Options([], [sizeOption.copy()]));
@@ -32,6 +32,8 @@ function average(tool, toolableVertices) {
 }
 
 function averageBrush(tool) {
+	console.log(tool.brushOptions);
+
 	let size = tool.brushOptions.size.value + 1;
 	let brush = [];
 	for (let y = 0; y < size; y++) {
@@ -44,10 +46,13 @@ function averageBrush(tool) {
 			}
 		}
 	}
+	console.log(brush);
 	return brush;
 }
 
-let townTool = new Tool("", { brushscaler: townBrush, tooling: towner });
+let nameOption = new TextOption("name", "", "town");
+let sizeFactor = new NumberOption("size_factor", 1, 0.01);
+let townTool = new Tool("", { brushscaler: townBrush, tooling: towner }, new Options([nameOption, sizeFactor], []));
 townTool.name = "town";
 function townBrush() {
 	return [[1]];
@@ -57,9 +62,7 @@ let lastTownTool = 0;
 function towner(tool, toolableVertices) {
 	if (lastTownTool + 1000 < Date.now()) {
 		if (toolableVertices.length > 0) {
-			//console.log();
-
-			Controller.addTerrainObject(new Town("Hej", toolableVertices[0][0], 1));
+			Controller.addTerrainObject(new Town(tool.toolOptions.name.value, toolableVertices[0][0], tool.toolOptions.size_factor.value));
 		}
 	}
 }

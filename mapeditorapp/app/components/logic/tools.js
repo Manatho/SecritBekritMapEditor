@@ -1,9 +1,8 @@
 export class Option {
-	constructor(name, value, min, max) {
+	constructor(name, value, type) {
 		this._name = name;
 		this._value = value;
-		this._min = min != null ? min : -Number.MAX_VALUE;
-		this._max = max != null ? max : Number.MAX_VALUE;
+		this._type = type;
 		this._onChanged = () => {};
 	}
 
@@ -11,16 +10,33 @@ export class Option {
 		this._onChanged = method;
 	}
 
+	set value(value) {
+		this._value = value;
+		this._onChanged(this._name, this._value);
+	}
+
+	get value() {
+		return this._value;
+	}
+
 	get name() {
 		return this._name;
 	}
 
-	get min() {
-		return this._min;
+	get type() {
+		return this._type;
 	}
 
-	get max() {
-		return this._max;
+	copy() {
+		return new Option(this._name, this._value);
+	}
+}
+
+export class NumberOption extends Option {
+	constructor(name, value, min, max) {
+		super(name, value, "NUMBER");
+		this._min = min != null ? min : -Number.MAX_VALUE;
+		this._max = max != null ? max : Number.MAX_VALUE;
 	}
 
 	get value() {
@@ -29,13 +45,33 @@ export class Option {
 
 	set value(value) {
 		this._value = Math.max(Math.min(value, this._max), this._min);
-		this._onChanged(this._name, this._value);
 	}
 
 	copy() {
-		return new Option(this._name, this._value, this._min, this._max);
+		return new NumberOption(this._name, this._value, this._min, this._max);
 	}
 }
+
+export class TextOption extends Option {
+	constructor(name, value, placeholder) {
+		super(name, value, "TEXT");
+		this._placeholder = placeholder;
+	}
+
+	get value() {
+		return this._value == "" ? this._placeholder : this._value;
+	}
+
+	set value(value) {
+		this._value = value;
+	}
+
+	copy() {
+		return new TextOption(this._name, this._value, this._placeholder);
+	}
+}
+
+window.NumberOption = NumberOption;
 
 export class Options {
 	constructor(toolOptions, brushOptions) {
