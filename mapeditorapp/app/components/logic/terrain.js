@@ -1,5 +1,5 @@
 import pako from "pako";
-import { StringDecoder } from "string_decoder";
+import { TerrainObjects } from "./TerrainObjects/terrainObjects";
 
 let THREE = require("../../libs/threemin.js");
 
@@ -28,18 +28,12 @@ let terrainMaterial = new THREE.RawShaderMaterial({
 	fragmentShader: require("./terrainShader/terrainShader.frag")
 });
 
-let planeWireMaterial = new THREE.MeshBasicMaterial({
-	color: 0x000000,
-	wireframe: true,
-	transparent: true,
-	opacity: 0.05
-});
-
 class Terrain {
 	static get PIXEL_PER_METER() {
 		return PIXEL_PER_METER;
 	}
 	constructor(name, mapsize, indiceworldsize, indiceSize, baseline, min, max) {
+		this.terrainObjects = new TerrainObjects();
 		this.name = name;
 		this.mapSize = mapsize;
 		this.indiceWorldSize = indiceworldsize * PIXEL_PER_METER;
@@ -288,6 +282,7 @@ class Terrain {
 			name: this.name,
 			min: this.min,
 			max: this.max,
+			terrainObjects: this.terrainObjects,
 			baseline: this.baseline,
 			mapsize: this.mapSize,
 			indiceWorldSize: this.indiceWorldSize / PIXEL_PER_METER,
@@ -322,6 +317,7 @@ class Terrain {
 				ts.heightData = new Float64Array(pako.inflate(ts.heightData).buffer);
 
 				let terrain = new Terrain(ts.name, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
+				terrain.terrainObjects = ts.terrainObjects;
 				terrain.setHeights(ts.heightData);
 				resolve(terrain);
 			});

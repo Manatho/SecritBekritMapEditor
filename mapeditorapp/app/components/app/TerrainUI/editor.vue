@@ -2,7 +2,8 @@
   <div>
     <canvas ref="threejs"></canvas>
     <div>
-      <div class="height-output">Height:
+      <div class="height-output">
+        Height:
         <span class="height-number">{{toolCenteredVertex.y.toFixed(0)}}m</span>
       </div>
     </div>
@@ -64,9 +65,6 @@ function setupThree(canvas) {
   //Scene
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xbab8b4);
-  let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  directionalLight.position.x = 0;
-  scene.add(directionalLight);
 
   initAddons();
   setupToolApply();
@@ -97,6 +95,14 @@ function setupThree(canvas) {
   }
 
   Controller.subscribe(ControllerEvents.Event_Terrain_Changed, setTerrain);
+  Controller.subscribe(
+    ControllerEvents.Event_Terrain_object_Added,
+    addTerrainObject
+  );
+  Controller.subscribe(
+    ControllerEvents.Event_Terrain_object_Removed,
+    removeTerrainObject
+  );
 }
 
 let terrain;
@@ -108,6 +114,14 @@ function setTerrain(newterrain) {
   if (newterrain != null) {
     newterrain.addToScene(scene);
   }
+}
+
+function addTerrainObject(object) {
+  object.addToScene(scene);
+}
+
+function removeTerrainObject(object) {
+  object.removeFromScene(scene);
 }
 
 export default {

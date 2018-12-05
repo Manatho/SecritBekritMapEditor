@@ -60,6 +60,14 @@ export const Controller = {
 	saveTerrain() {
 		terrain.save();
 	},
+	addTerrainObject(terrainObject) {
+		terrain.terrainObjects.add(terrainObject);
+		eventbus.$emit(ControllerEvents.Event_Terrain_object_Added, terrainObject);
+	},
+	removeTerrainObject(terrainObject) {
+		terrain.terrainObjects.remove(terrainObject);
+		eventbus.$emit(ControllerEvents.Event_Terrain_object_Removed, terrainObject);
+	},
 	get pngData() {
 		return pngdata;
 	},
@@ -102,6 +110,8 @@ function findBestIndiceSize(base, worldsize) {
 
 export const ControllerEvents = {
 	Event_PNG_Data_Changed: "png-data-changed",
+	Event_Terrain_object_Added: "terrain-object-added",
+	Event_Terrain_object_Removed: "terrain-object-removed",
 	Event_Terrain_Changed: "terrain-changed"
 };
 

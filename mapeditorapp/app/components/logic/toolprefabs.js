@@ -1,4 +1,6 @@
 import { Tool, Options, Option } from "./tools";
+import { Controller } from "./controller";
+import { Town } from "./TerrainObjects/town";
 
 let strengthOption = new Option("strength", 5);
 let sizeOption = new Option("size", 5, 1);
@@ -53,8 +55,11 @@ function townBrush() {
 let lastTownTool = 0;
 function towner(tool, toolableVertices) {
 	if (lastTownTool + 1000 < Date.now()) {
-		console.log(tool, toolableVertices);
-		lastTownTool = Date.now();
+		if (toolableVertices.length > 0) {
+			//console.log();
+
+			Controller.addTerrainObject(new Town("Hej", toolableVertices[0][0].getWorldPosition(), 1));
+		}
 	}
 }
 
