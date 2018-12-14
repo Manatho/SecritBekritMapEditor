@@ -1,3 +1,5 @@
+import { ToolableVertex } from "../terrain.js";
+
 let THREE = require("../../../libs/threemin.js");
 
 class Town {
@@ -40,6 +42,30 @@ class Town {
 		this.mesh.material.dispose();
 		this.mesh.material = null;
 		this.mesh = null;
+	}
+
+	save() {
+		let saveObject = {};
+		saveObject.name = this.name;
+		saveObject.sizeFactor = this.sizeFactor;
+		saveObject.type = this.type;
+		saveObject.positionIndex = this._position.getIndex();
+		saveObject.positionMeshName = this._position.getMeshName();
+		return saveObject;
+	}
+
+	static load(savedObject, terrain) {
+		let mesh = terrain.getMesh(savedObject.positionMeshName);
+		let position = new THREE.Vector3(
+			mesh.geometry.attributes.position.array[savedObject.positionIndex + 0],
+			mesh.geometry.attributes.position.array[savedObject.positionIndex + 1],
+			mesh.geometry.attributes.position.array[savedObject.positionIndex + 2]
+		);
+		mesh.updateMatrixWorld();
+
+		position.index = savedObject.positionIndex;
+		position = new ToolableVertex(position, mesh, 0, 0);
+		return new Town(savedObject.name, position, savedObject.sizeFactor);
 	}
 }
 

@@ -143,6 +143,9 @@ class Terrain {
 
 		this.updateGeometries(this._meshes.map(x => x.geometry));
 	}
+	getMesh(name) {
+		return this._meshes.find(x => x.name === name);
+	}
 	getAffectedMeshesAndVertices(raycaster, brush2d) {
 		// the mesh clicked is found:
 		let intersects = raycaster.intersectObjects(this._meshes);
@@ -282,7 +285,7 @@ class Terrain {
 			name: this.name,
 			min: this.min,
 			max: this.max,
-			terrainObjects: this.terrainObjects,
+			terrainObjects: this.terrainObjects.save(),
 			baseline: this.baseline,
 			mapsize: this.mapSize,
 			indiceWorldSize: this.indiceWorldSize / PIXEL_PER_METER,
@@ -303,8 +306,6 @@ class Terrain {
 		element.style.display = "none";
 		element.click();
 		element = null;
-
-		console.log("Done");
 	}
 	static async load(file, progress) {
 		const terrain = await new Promise(function(resolve, reject) {
@@ -317,8 +318,8 @@ class Terrain {
 				ts.heightData = new Float64Array(pako.inflate(ts.heightData).buffer);
 
 				let terrain = new Terrain(ts.name, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
-				terrain.terrainObjects = ts.terrainObjects;
 				terrain.setHeights(ts.heightData);
+				terrain.terrainObjects = TerrainObjects.load(ts.terrainObjects, terrain);
 				resolve(terrain);
 			});
 			reader.readAsArrayBuffer(file);
@@ -506,6 +507,14 @@ class ToolableVertex {
 		vertex.applyMatrix4(this._meshes[0].matrixWorld);
 		return { x: vertex.x, y: vertex.y, z: vertex.z };
 	}
+
+	getIndex() {
+		return this._vertices[0].index;
+	}
+
+	getMeshName() {
+		return this._meshes[0].name;
+	}
 }
 
-export { Terrain };
+export { Terrain, ToolableVertex };

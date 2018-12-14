@@ -1,3 +1,5 @@
+import { Town } from "./town";
+
 class TerrainObjects {
 	constructor() {
 		this.towns = [];
@@ -21,6 +23,31 @@ class TerrainObjects {
 		this.towns.forEach(town => {
 			town.updatePosition();
 		});
+	}
+	addAllToScene(scene) {
+		this.towns.forEach(town => {
+			town.addToScene(scene);
+		});
+	}
+	removeAllFromScene(scene) {
+		this.towns.forEach(town => {
+			town.removeFromScene(scene);
+		});
+	}
+	save() {
+		let data = {};
+		data.towns = [];
+		this.towns.forEach(town => {
+			data.towns.push(town.save());
+		});
+		return data;
+	}
+	static load(savedTerrainobjects, terrain) {
+		let terrainObjects = new TerrainObjects();
+		savedTerrainobjects.towns.forEach(town => {
+			terrainObjects.add(Town.load(town, terrain));
+		});
+		return terrainObjects;
 	}
 }
 

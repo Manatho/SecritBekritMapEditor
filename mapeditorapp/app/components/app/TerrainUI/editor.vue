@@ -146,10 +146,12 @@ let terrain;
 function setTerrain(newterrain) {
     if (terrain) {
         terrain.removeFromScene(scene);
+        terrain.terrainObjects.removeAllFromScene(scene);
     }
     terrain = newterrain;
     if (newterrain != null) {
         newterrain.addToScene(scene);
+        newterrain.terrainObjects.addAllToScene(scene);
     }
 }
 
