@@ -45,6 +45,7 @@ export class NumberOption extends Option {
 
 	set value(value) {
 		this._value = Math.max(Math.min(value, this._max), this._min);
+		this._onChanged(this._name, this._value);
 	}
 
 	copy() {
@@ -64,6 +65,7 @@ export class TextOption extends Option {
 
 	set value(value) {
 		this._value = value;
+		this._onChanged(this._name, this._value);
 	}
 
 	copy() {
