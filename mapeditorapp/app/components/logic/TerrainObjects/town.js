@@ -2,6 +2,8 @@ import { ToolableVertex } from "../terrain.js";
 
 let THREE = require("../../../libs/threemin.js");
 
+const normalTownArea = Math.PI * (400*400) //circle area;
+
 class Town {
 	/**
 	 *
@@ -17,7 +19,9 @@ class Town {
 		this._position = position;
 
 		let material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true });
-		let geometry = new THREE.BoxGeometry(100, 100, 100);
+
+		let radius = Math.sqrt((normalTownArea * (sizeFactor*0.8))/Math.PI);
+		let geometry = new THREE.CylinderGeometry(radius, radius, 100, 20);
 		this.mesh = new THREE.Mesh(geometry, material);
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;

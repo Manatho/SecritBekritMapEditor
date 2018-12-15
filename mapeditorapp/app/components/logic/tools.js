@@ -33,8 +33,9 @@ export class Option {
 }
 
 export class NumberOption extends Option {
-	constructor(name, value, min, max) {
+	constructor(name, value, min, max, increment) {
 		super(name, value, "NUMBER");
+		this.increment = increment ? increment : 1;
 		this._min = min != null ? min : -Number.MAX_VALUE;
 		this._max = max != null ? max : Number.MAX_VALUE;
 	}

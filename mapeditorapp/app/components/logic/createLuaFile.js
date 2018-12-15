@@ -9,7 +9,9 @@ const placeholders = {
 };
 
 const maplua = `
-local towns = {${placeholders.towns.placeholder}}
+local towns = {
+${placeholders.towns.placeholder}
+}
 
 local industries = {${placeholders.industries.placeholder}}
 

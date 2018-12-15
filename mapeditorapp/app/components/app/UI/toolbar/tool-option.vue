@@ -5,7 +5,6 @@
             v-if="option.type === 'NUMBER'"
             ref="input"
             type="number"
-            step="1"
             :value="option.value"
             @keyup.enter="onEnter"
             @mousedown.left="onLeft"
@@ -35,6 +34,7 @@ export default {
     },
     mounted() {
         this.input = this.$refs.input;
+        
     },
     data() {
         return {
@@ -52,10 +52,9 @@ export default {
         },
         onMove(event) {
             if (event.buttons == 1) {
-                let difference = ((mouseEvent.y - event.y) / 10) >> 0;
-                this.input.value =
-                    Number.parseInt(mouseEvent.strength) +
-                    Number.parseInt(difference);
+                let difference = ((mouseEvent.y - event.y) / 10);
+                difference = Math.round(difference/this.option.increment)*this.option.increment;
+                this.input.value = (new Number(mouseEvent.strength) + difference).toFixed(1);
             }
         },
         onBlur(event) {

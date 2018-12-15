@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { Terrain } from "./terrain";
 import { raiseTool, averageTool, townTool } from "./toolprefabs";
+import { TerrainObjects } from "./TerrainObjects/terrainObjects";
 
 let eventbus = new Vue();
 
@@ -29,6 +30,12 @@ export const Controller = {
 	},
 	get terrain() {
 		return terrain;
+	},
+	/**
+	 * @returns {TerrainObjects}
+	 */
+	get terrainObjects() {
+		return terrain.terrainObjects;
 	},
 	get scaling() {
 		return scaling;

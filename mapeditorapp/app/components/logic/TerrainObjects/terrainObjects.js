@@ -1,8 +1,7 @@
 import { Town } from "./town";
-
 class TerrainObjects {
 	constructor() {
-		this.towns = [];
+		/** @type {Town[]} */ this.towns = [];
 		this.industries = [];
 		this.meshes = [];
 	}
@@ -33,6 +32,17 @@ class TerrainObjects {
 		this.towns.forEach(town => {
 			town.removeFromScene(scene);
 		});
+	}
+	/**
+	 * @returns {String}
+	 */
+	createTownString() {
+		//Format:  {pos = { x, y }, name = name, sizeFactor = n},
+		let string = "";
+		this.towns.forEach(town => {
+			string += `  { pos = { ${town.position.x}, ${-town.position.z} }, name = _("${town.name}"), sizeFactor = ${town.sizeFactor}},\n`;
+		});
+		return string.substring(0, string.length - 2); // Exclude last ",\n" from string
 	}
 	save() {
 		let data = {};
