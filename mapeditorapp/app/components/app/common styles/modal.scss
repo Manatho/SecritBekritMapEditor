@@ -87,6 +87,27 @@ h4 {
 	box-shadow: 0 1px 2px 0px black;
 }
 
+.number-input {
+	font-family: $font;
+	color: $element-backgroundlight;
+	font-size: 13px;
+	margin: auto;
+	width: 48%;
+	text-align: center;
+	border-radius: 5px;
+	border: 1px solid transparent;
+	background-color: $element-background;
+}
+
+.number-input:focus {
+	outline: none;
+	border: 1px solid $element-background-border;
+}
+
+.number-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+}
+
 .radioinput:hover ~ .radio {
 	background-color: $element-hover;
 }

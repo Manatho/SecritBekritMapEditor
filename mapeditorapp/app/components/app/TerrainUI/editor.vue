@@ -2,6 +2,7 @@
     <div>
         <canvas ref="threejs"></canvas>
         <div>
+            <TerrainObjectEditor></TerrainObjectEditor>
             <div class="height-output">
                 Height:
                 <span class="height-number">{{toolCenteredVertex.y.toFixed(0)}}m</span>
@@ -11,6 +12,9 @@
 </template>
 
 <script>
+//UI
+import TerrainObjectEditor from "./terrain-object-editor.vue";
+
 //Libs and logic
 let THREE = require("../../../libs/threemin.js");
 let InputController = require("./scripts/input.js").Controller;
@@ -39,10 +43,16 @@ function setupToolApply() {
 
         if (Controller.tool.name == "town") {
             if (townIntersect.length == 0 && event.button == 0) {
+                Controller.deselectTerrainObject();
                 raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
                 Controller.applyTool(raycaster, event.button);
-            } else if (townIntersect.length > 0 && event.button == 2) {
-                Controller.removeTerrainObject(townIntersect[0].object.owner);
+            } else if (townIntersect.length > 0) {
+                if(event.button == 2){
+                    Controller.deselectTerrainObject();
+                    Controller.removeTerrainObject(townIntersect[0].object.owner);
+                } else if(event.button == 0){
+                    Controller.terrainObjectSelected(townIntersect[0].object.owner)
+                }
             }
         } else {
             Controller.applyTool(raycaster, event.button);
@@ -79,13 +89,13 @@ function setupToolApply() {
             if (townIntersect.length == 0) {
                 if (hoveredMap.length > 0) {
                     hoveredMap.forEach(object => {
-                        if (object.material) object.material.opacity = 1;
+                        object.owner.unhovered();
                     });
                     hoveredMap = [];
                 }
             } else {
                 let intersected = townIntersect[0].object;
-                intersected.material.opacity = 0.7;
+                intersected.owner.hovered();
                 hoveredMap.push(intersected);
             }
         }
@@ -164,6 +174,9 @@ function removeTerrainObject(object) {
 }
 
 export default {
+    components: {
+        TerrainObjectEditor
+    },
     mounted() {
         setupThree(this.$refs.threejs);
         window.scene = scene;

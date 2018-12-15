@@ -58,6 +58,7 @@ import { Controller } from "../logic/controller.js";
 import { PNG160 } from "../logic/images/PNG160.js";
 import { gaussBlur } from "../logic/images/gaussianblur.js";
 import { ResampleLanczos } from "../logic/images/lanczos.js";
+import { TERRAIN_MAX_HEIGHT, TERRAIN_MIN_HEIGHT } from '../logic/constants.js';
 let Progressbar = require("./progressbar.vue").default.controller;
 console.log(Progressbar);
 
@@ -123,9 +124,9 @@ export default {
 			let target = event.target;
 
 			if (target.name == "importmin") {
-				this.minheight = Math.max(0, this.minheight);
+				this.minheight = Math.max(TERRAIN_MIN_HEIGHT, this.minheight);
 			} else if (target.name == "importmax") {
-				this.maxheight = Math.min(1000, this.maxheight);
+				this.maxheight = Math.min(TERRAIN_MAX_HEIGHT, this.maxheight);
 			}
 			this.minheight = Math.min(this.minheight, this.maxheight);
 			let waterheight = Math.max(0, ((100 - this.minheight) / this.maxheight) * 255);
@@ -151,8 +152,8 @@ export default {
 
 			//Settings
 			Scales: [1, 2, 4, 8, 16, 32],
-			minheight: 0,
-			maxheight: 1000,
+			minheight: TERRAIN_MIN_HEIGHT,
+			maxheight: TERRAIN_MAX_HEIGHT,
 			selectedScale: 4,
 			name: "",
 
@@ -264,27 +265,6 @@ canvas {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 5px;
-}
-
-.number-input {
-	font-family: $font;
-	color: $element-backgroundlight;
-	font-size: 13px;
-	margin: auto;
-	width: 48%;
-	text-align: center;
-	border-radius: 5px;
-	border: 1px solid transparent;
-	background-color: $element-background;
-}
-
-.number-input:focus {
-	outline: none;
-	border: 1px solid $element-background-border;
-}
-
-.number-input::-webkit-inner-spin-button {
-	-webkit-appearance: none;
 }
 
 .err {

@@ -1,4 +1,5 @@
 import { ToolableVertex } from "../terrain.js";
+import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "../constants.js";
 
 let THREE = require("../../../libs/threemin.js");
 
@@ -13,7 +14,7 @@ class Town {
 	 */
 	constructor(name, position, sizeFactor) {
 		this.name = name;
-		this.sizeFactor = sizeFactor;
+		this._sizeFactor = sizeFactor;
 		this.type = "TOWN";
 
 		this._position = position;
@@ -30,6 +31,23 @@ class Town {
 	}
 	get position() {
 		return this.mesh.position;
+	}
+	get sizeFactor(){
+		return this._sizeFactor;
+	}
+	set sizeFactor(size){
+		this._sizeFactor = Math.min(Math.max(size, TOWN_SIZE_FACTOR_MIN), TOWN_SIZE_FACTOR_MAX);
+		let scale = Math.sqrt((normalTownArea * (this._sizeFactor*0.8))/Math.PI) / this.mesh.geometry.parameters.radiusTop;
+		console.log(scale);
+		this.mesh.scale.x = scale;
+		this.mesh.scale.z = scale;
+		
+	}
+	hovered(){
+		this.mesh.material.opacity = 0.3;
+	}
+	unhovered(){
+		this.mesh.material.opacity = 0.7;
 	}
 	updatePosition() {
 		this.mesh.position.y = this._position.height + 150;

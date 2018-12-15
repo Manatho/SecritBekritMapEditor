@@ -1,6 +1,7 @@
 import { Tool, Options, NumberOption, TextOption } from "./tools";
 import { Controller } from "./controller";
 import { Town } from "./TerrainObjects/town";
+import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "./constants";
 
 let strengthOption = new NumberOption("strength", 1);
 let sizeOption = new NumberOption("size", 5, 1);
@@ -51,7 +52,7 @@ function averageBrush(tool) {
 }
 
 let nameOption = new TextOption("name", "", "town");
-let sizeFactor = new NumberOption("size_factor", 1, 0.5, 2, 0.1);
+let sizeFactor = new NumberOption("size_factor", 1, TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX, 0.1);
 let townTool = new Tool("", { brushscaler: townBrush, tooling: towner }, new Options([nameOption, sizeFactor], []));
 townTool.name = "town";
 function townBrush() {

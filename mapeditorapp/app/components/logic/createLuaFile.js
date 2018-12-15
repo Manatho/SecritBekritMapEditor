@@ -1,3 +1,5 @@
+import { TERRAIN_MAX_HEIGHT, TERRAIN_MIN_HEIGHT } from "./constants";
+
 const placeholders = {
 	towns: { placeholder: "%towns%", default: "" },
 	industries: { placeholder: "%industries%", default: "" },
@@ -31,7 +33,7 @@ function data() return {
   name  = _('${placeholders.name.placeholder}'),
   description = _('${placeholders.description.placeholder}'),
   minGameVersion = '10000',
-  range = {0, 1000 },
+  range = {${TERRAIN_MIN_HEIGHT}, ${TERRAIN_MAX_HEIGHT} },
   seed = '${placeholders.seed.placeholder}',
   tags  = {'map'},
   towns = towns,

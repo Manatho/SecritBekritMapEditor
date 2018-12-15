@@ -2,6 +2,7 @@ import Vue from "vue";
 import { Terrain } from "./terrain";
 import { raiseTool, averageTool, townTool } from "./toolprefabs";
 import { TerrainObjects } from "./TerrainObjects/terrainObjects";
+import { TERRAIN_MIN_HEIGHT, TERRAIN_MAX_HEIGHT } from "./constants";
 
 let eventbus = new Vue();
 
@@ -22,6 +23,7 @@ export const Controller = {
 		return tool;
 	},
 	set tool(newtool) {
+		this.deselectTerrainObject();
 		tool = newtool;
 	},
 	applyTool(raycaster, direction) {
@@ -47,7 +49,7 @@ export const Controller = {
 		let indiceCount = actualSize / indiceSize;
 		let indiceworldsize = ((size / 1024) * 1000) / indiceCount;
 
-		terrain = new Terrain(name, actualSize, indiceworldsize, indiceSize, baselineheight, 0, 1000);
+		terrain = new Terrain(name, actualSize, indiceworldsize, indiceSize, baselineheight, TERRAIN_MIN_HEIGHT, TERRAIN_MAX_HEIGHT);
 		scaling = scale;
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
@@ -55,12 +57,8 @@ export const Controller = {
 	},
 	async loadTerrain(file, progress) {
 		terrain = await Terrain.load(file, progress);
-
-		console.log(terrain.mapSize, terrain._indiceSize, terrain.indiceWorldSize, Terrain.PIXEL_PER_METER);
-
 		scaling = (128 * (terrain.mapSize / (terrain._indiceSize - 1)) * terrain.indiceWorldSize) / (125 * terrain.mapSize);
 		scaling /= Terrain.PIXEL_PER_METER;
-		console.log(scaling);
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);
 	},
@@ -74,6 +72,14 @@ export const Controller = {
 	removeTerrainObject(terrainObject) {
 		terrain.terrainObjects.remove(terrainObject);
 		eventbus.$emit(ControllerEvents.Event_Terrain_object_Removed, terrainObject);
+	},
+	terrainObjectSelected(terrainObject){
+		console.log("Hej");
+		
+		eventbus.$emit(ControllerEvents.Event_Terrain_Object_Selected, terrainObject);
+	},
+	deselectTerrainObject(){
+		eventbus.$emit(ControllerEvents.Event_Terrain_Object_Selected, null);
 	},
 	get pngData() {
 		return pngdata;
@@ -90,10 +96,7 @@ export const Controller = {
 		render = false;
 		return old;
 	},
-
 	subscribe(eventType, method) {
-		console.log(eventType);
-
 		eventbus.$on(eventType, method);
 	},
 	unsubscribe(eventType, method) {
@@ -119,7 +122,8 @@ export const ControllerEvents = {
 	Event_PNG_Data_Changed: "png-data-changed",
 	Event_Terrain_object_Added: "terrain-object-added",
 	Event_Terrain_object_Removed: "terrain-object-removed",
-	Event_Terrain_Changed: "terrain-changed"
+	Event_Terrain_Changed: "terrain-changed",
+	Event_Terrain_Object_Selected: "terrain-object-selected"
 };
 
 window.Controller = Controller;
