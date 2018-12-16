@@ -52,10 +52,16 @@ class TerrainObjects {
 	 * @returns {String}
 	 */
 	createTownString() {
-		//Format:  {pos = { x, y }, name = name, sizeFactor = n},
 		let string = "";
 		this.towns.forEach(town => {
-			string += `  { pos = { ${town.position.x}, ${-town.position.z} }, name = _("${town.name}"), sizeFactor = ${town.sizeFactor}},\n`;
+			string += "  " + town.toLuaString();
+		});
+		return string.substring(0, string.length - 2); // Exclude last ",\n" from string
+	}
+	createIndustryString(){
+		let string = "";
+		this.industries.forEach(industry => {
+			string += "  " + industry.toLuaString();
 		});
 		return string.substring(0, string.length - 2); // Exclude last ",\n" from string
 	}

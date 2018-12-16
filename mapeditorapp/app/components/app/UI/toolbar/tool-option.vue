@@ -21,7 +21,7 @@
             @blur="onBlur"
         >
         <select v-else="option.type == 'CHOICE'" ref="input" @blur="onBlur" @change="blur">
-            <option v-for="(choice, index) in option.choices" :value="choice"> {{choice.charAt(0).toUpperCase() + choice.slice(1).replace(/_/g, " ")}}</option>
+            <option v-for="(choice, index) in option.choices" :value="index"> {{choice.charAt(0).toUpperCase() + choice.slice(1).replace(/_/g, " ")}}</option>
         </select>
     </div>
 </template>

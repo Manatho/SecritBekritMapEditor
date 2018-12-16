@@ -44,7 +44,6 @@ class Industry {
 	addToScene(scene) {
 		scene.add(this.mesh);
 	}
-
 	removeFromScene(scene) {
 		scene.remove(this.mesh);
 		this.mesh.geometry.dispose();
@@ -55,7 +54,9 @@ class Industry {
         this.unhovered = () => {}
 		this.hovered = () => {}
 	}
-
+	toLuaString(){
+		return `{ pos = { ${this.position.x}, ${-this.position.z} }, angle = math.rad(${this.angle}), name = _("${this.name}"), fileName = "industry/${this.industry}.con"},\n`
+	}
 	save() {
 		let saveObject = {};
 		saveObject.name = this.name;

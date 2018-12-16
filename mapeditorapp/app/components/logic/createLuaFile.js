@@ -15,7 +15,9 @@ local towns = {
 ${placeholders.towns.placeholder}
 }
 
-local industries = {${placeholders.industries.placeholder}}
+local industries = {
+${placeholders.industries.placeholder}
+}
 
 function data() return {
   authors = {

@@ -38,7 +38,6 @@ class Town {
 	set sizeFactor(size){
 		this._sizeFactor = Math.min(Math.max(size, TOWN_SIZE_FACTOR_MIN), TOWN_SIZE_FACTOR_MAX);
 		let scale = Math.sqrt((normalTownArea * (this._sizeFactor*0.8))/Math.PI) / this.mesh.geometry.parameters.radiusTop;
-		console.log(scale);
 		this.mesh.scale.x = scale;
 		this.mesh.scale.z = scale;
 		
@@ -56,7 +55,6 @@ class Town {
 	addToScene(scene) {
 		scene.add(this.mesh);
 	}
-
 	removeFromScene(scene) {
 		scene.remove(this.mesh);
 		this.mesh.geometry.dispose();
@@ -67,7 +65,9 @@ class Town {
 		this.unhovered = () => {}
 		this.hovered = () => {}
 	}
-
+	toLuaString(){
+		return `{ pos = { ${this.position.x}, ${-this.position.z} }, name = _("${this.name}"), sizeFactor = ${this.sizeFactor}},\n`
+	}
 	save() {
 		let saveObject = {};
 		saveObject.name = this.name;

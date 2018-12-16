@@ -78,6 +78,7 @@ industryTool.name = "town";
 
 function industryPlacer(tool, toolableVertices) {
 	if (toolableVertices.length > 0) {
+		console.log(tool.toolOptions.industry);
 		Controller.addTerrainObject(new Industry(tool.toolOptions.name.value, toolableVertices[0][0],tool.toolOptions.industry.value, tool.toolOptions.angle.value));
 	}
 }
