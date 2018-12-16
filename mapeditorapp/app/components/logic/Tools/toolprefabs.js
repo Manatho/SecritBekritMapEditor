@@ -72,13 +72,13 @@ function townplacer(tool, toolableVertices) {
 
 let industryNameOption = new TextOption("name", "", "industry");
 let angleOption = new NumberOption("angle", 1, 0, 360, 1);
-let industryOption = new ChoiceOption("Industry", ListIndustries());
+let industryOption = new ChoiceOption("industry", ListIndustries());
 let industryTool = new Tool("", { brushscaler: placementBrush, tooling: industryPlacer }, new Options([industryNameOption, angleOption, industryOption], []));
 industryTool.name = "town";
 
 function industryPlacer(tool, toolableVertices) {
 	if (toolableVertices.length > 0) {
-		Controller.addTerrainObject(new Industry(tool.toolOptions.name.value, toolableVertices[0][0],"test", 0));
+		Controller.addTerrainObject(new Industry(tool.toolOptions.name.value, toolableVertices[0][0],tool.toolOptions.industry.value, tool.toolOptions.angle.value));
 	}
 }
 

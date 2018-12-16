@@ -25,7 +25,8 @@ class Industry {
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;
 		this.mesh.position.y = position.y;
-		this.mesh.position.z = position.z;
+        this.mesh.position.z = position.z;
+        this.mesh.rotation.y = Math.PI/180 * (this.angle % 360);
 	}
 	get position() {
 		return this.mesh.position;
