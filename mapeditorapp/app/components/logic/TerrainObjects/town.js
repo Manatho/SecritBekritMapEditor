@@ -1,5 +1,6 @@
 import { ToolableVertex } from "../terrain.js";
 import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "../constants.js";
+import { Controller } from "../controller.js";
 
 let THREE = require("../../../libs/threemin.js");
 
@@ -40,6 +41,7 @@ class Town {
 		let scale = Math.sqrt((normalTownArea * (this._sizeFactor*0.8))/Math.PI) / this.mesh.geometry.parameters.radiusTop;
 		this.mesh.scale.x = scale;
 		this.mesh.scale.z = scale;
+		Controller.requestRender();
 		
 	}
 	hovered(){

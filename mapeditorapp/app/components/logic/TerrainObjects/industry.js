@@ -1,4 +1,5 @@
 import { ToolableVertex } from "../terrain.js";
+import { Controller } from "../controller.js";
 
 let THREE = require("../../../libs/threemin.js");
 
@@ -13,7 +14,6 @@ class Industry {
 	constructor(name, position, industry, angle) {
 		this.name = name;
         this.industry = industry;
-        this.angle = angle;
 		this.type = "INDUSTRY";
 
 		this._position = position;
@@ -26,11 +26,20 @@ class Industry {
 		this.mesh.position.x = position.x;
 		this.mesh.position.y = position.y;
         this.mesh.position.z = position.z;
-        this.mesh.rotation.y = Math.PI/180 * (this.angle % 360);
+
+        this.angle = angle;
 	}
 	get position() {
 		return this.mesh.position;
-	}
+    }
+    set angle(newAngle){
+        this._angle = newAngle % 360;
+        this.mesh.rotation.y = Math.PI/180 * this.angle;
+        Controller.requestRender();
+    }
+    get angle(){
+        return this._angle;
+    }
 	hovered(){
 		this.mesh.material.opacity = 0.3;
 	}

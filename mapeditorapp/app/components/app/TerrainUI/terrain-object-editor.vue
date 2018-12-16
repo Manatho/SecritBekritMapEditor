@@ -9,18 +9,49 @@
             @keypress="onkey"
             @blur="onblur"
         >
-        <div class="setting">
-            <div style="display:flex">
-                <div>
-                    <label>Size Factor:</label>
-                    <input
-                        type="number"
-                        name="importmin"
-                        class="number-input input"
-                        v-model="sizeFactor"
-                        @keyup.enter="blur"
-                        @blur="onblur"
-                    >
+        <div v-if="show && this.terrainObject.type == 'TOWN'">
+            <div class="setting">
+                <div style="display:flex">
+                    <div>
+                        <label>Size Factor:</label>
+                        <input
+                            type="number"
+                            class="number-input input"
+                            v-model="townSizeFactor"
+                            @keyup.enter="blur"
+                            @blur="onblur"
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="setting">
+                <div style="display:flex">
+                    <div>
+                        <label>Angle:</label>
+                        <input
+                            type="number"
+                            name="angle"
+                            class="number-input input"
+                            v-model="industryAngle"
+                            @keyup.enter="blur"
+                            @blur="onblur"
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="setting">
+                <div style="display:flex">
+                    <div>
+                        <label>Type:</label>
+                        <select @blur="onblur" @change="blur" v-model="industryType" class="number-input input">
+                            <option
+                                v-for="choice in choices"
+                                :value="choice"
+                            >{{choice.charAt(0).toUpperCase() + choice.slice(1).replace(/_/g, " ")}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -30,7 +61,11 @@
 <script>
 import { Controller } from "../../logic/controller.js";
 import { ControllerEvents } from "../../logic/controller.js";
-import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "../../logic/constants.js";
+import {
+    TOWN_SIZE_FACTOR_MIN,
+    TOWN_SIZE_FACTOR_MAX,
+    ListIndustries
+} from "../../logic/constants.js";
 export default {
     methods: {
         blur(event) {
@@ -48,19 +83,35 @@ export default {
             event.preventDefault();
         },
         onblur(event) {
-            this.town.name = this.name;
-            this.town.sizeFactor = this.sizeFactor;
-            this.sizeFactor = this.town.sizeFactor;
+            if (this.terrainObject.type == "TOWN") {
+                this.terrainObject.name = this.name;
+                this.terrainObject.sizeFactor = this.townSizeFactor;
+                this.townSizeFactor = this.town.sizeFactor;
+            } else {
+                this.terrainObject.name = this.name;
+                this.terrainObject.angle = this.industryAngle;
+                this.industryAngle = this.terrainObject.angle;
+                this.terrainObject.industry = this.industryType;
+            }
+        },
+        blur(event) {
+            event.target.blur();
         }
     },
     mounted() {
         Controller.subscribe(
             ControllerEvents.Event_Terrain_Object_Selected,
             object => {
-                this.town = object;
-                if(object){
+                this.terrainObject = object;
+                if (object) {
                     this.name = object.name;
-                    this.sizeFactor = object.sizeFactor;
+                    if(this.terrainObject.type == "TOWN"){
+                        this.townSizeFactor = object.sizeFactor;
+                    } else {
+                        this.industryAngle = object.angle;
+                        this.industryType = object.industry;
+                        this.$forceUpdate();
+                    }
                     this.show = true;
                 } else {
                     this.show = false;
@@ -71,8 +122,11 @@ export default {
     data() {
         return {
             name: "",
-            sizeFactor: 0,
-            show: false
+            townSizeFactor: 0,
+            industryAngle: 0,
+            industryType: 0,
+            show: false,
+            choices: ListIndustries()
         };
     }
 };
@@ -93,7 +147,13 @@ label {
     font-weight: bold;
 }
 
+option{
+    border: none;
+}
+
 .input {
+    color: white;
     width: 60%;
+    float: right;
 }
 </style>
