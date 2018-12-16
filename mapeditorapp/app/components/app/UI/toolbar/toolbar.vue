@@ -26,7 +26,8 @@ let tools = [];
 let srcs = [
   require("./images/in-decrease.png"),
   require("./images/average.png"),
-  require("./images/village.png")
+  require("./images/village.png"),
+  require("./images/industry.png")
 ];
 
 Controller.tools.forEach((tool, index) => {

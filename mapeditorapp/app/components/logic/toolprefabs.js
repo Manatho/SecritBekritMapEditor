@@ -51,16 +51,16 @@ function averageBrush(tool) {
 	return brush;
 }
 
-let nameOption = new TextOption("name", "", "town");
+let townNameOption = new TextOption("name", "", "town");
 let sizeFactor = new NumberOption("size_factor", 1, TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX, 0.1);
-let townTool = new Tool("", { brushscaler: townBrush, tooling: towner }, new Options([nameOption, sizeFactor], []));
+let townTool = new Tool("", { brushscaler: placementBrush, tooling: townplacer }, new Options([townNameOption, sizeFactor], []));
 townTool.name = "town";
-function townBrush() {
+function placementBrush() {
 	return [[1]];
 }
 
 let lastTownTool = 0;
-function towner(tool, toolableVertices) {
+function townplacer(tool, toolableVertices) {
 	if (lastTownTool + 1000 < Date.now()) {
 		if (toolableVertices.length > 0) {
 			Controller.addTerrainObject(new Town(tool.toolOptions.name.value, toolableVertices[0][0], tool.toolOptions.size_factor.value));
@@ -68,4 +68,16 @@ function towner(tool, toolableVertices) {
 	}
 }
 
-export { raiseTool, averageTool, townTool };
+let industryNameOption = new TextOption("name", "", "industry");
+let industryTool = new Tool("", { brushscaler: placementBrush, tooling: industryPlacer }, new Options([industryNameOption], []));
+industryTool.name = "town";
+
+function industryPlacer(tool, toolableVertices) {
+	if (toolableVertices.length > 0) {
+		console.log("Industry");
+		
+		//Controller.addTerrainObject(new Town(tool.toolOptions.name.value, toolableVertices[0][0], tool.toolOptions.size_factor.value));
+	}
+}
+
+export { raiseTool, averageTool, townTool, industryTool };
