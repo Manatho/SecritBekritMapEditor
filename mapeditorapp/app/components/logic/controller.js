@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { Terrain } from "./terrain";
-import { raiseTool, averageTool, townTool, industryTool } from "./toolprefabs";
+import { raiseTool, averageTool, townTool, industryTool } from "./Tools/toolprefabs";
 import { TerrainObjects } from "./TerrainObjects/terrainObjects";
 import { TERRAIN_MIN_HEIGHT, TERRAIN_MAX_HEIGHT } from "./constants";
 

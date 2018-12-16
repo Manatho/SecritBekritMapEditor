@@ -20,7 +20,7 @@ class Industry {
 
 		let material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true });
 
-		let geometry = new THREE.BoxGeometry(130, 130, 100);
+		let geometry = new THREE.BoxGeometry(130, 100, 130);
 		this.mesh = new THREE.Mesh(geometry, material);
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;
