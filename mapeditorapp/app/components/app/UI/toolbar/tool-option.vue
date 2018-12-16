@@ -6,20 +6,23 @@
             ref="input"
             type="number"
             :value="option.value"
-            @keyup.enter="onEnter"
+            @keyup.enter="blur"
             @mousedown.left="onLeft"
             @mouseup.left="onLeftUp"
             @mousemove="onMove"
             @blur="onBlur"
         >
         <input
-            v-else
+            v-else-if="option.type == 'TEXT'"
             ref="input"
             type="text"
             :value="option.value"
-            @keyup.enter="onEnter"
+            @keyup.enter="blur"
             @blur="onBlur"
         >
+        <select v-else="option.type == 'CHOICE'" ref="input" @blur="onBlur" @change="blur">
+            <option v-for="(choice, index) in option.choices" :value="choice"> {{choice.charAt(0).toUpperCase() + choice.slice(1).replace(/_/g, " ")}}</option>
+        </select>
     </div>
 </template>
 
@@ -34,7 +37,6 @@ export default {
     },
     mounted() {
         this.input = this.$refs.input;
-        
     },
     data() {
         return {
@@ -42,7 +44,7 @@ export default {
         };
     },
     methods: {
-        onEnter(event) {
+        blur(event) {
             this.input.blur();
         },
         onLeft(event) {
@@ -52,9 +54,13 @@ export default {
         },
         onMove(event) {
             if (event.buttons == 1) {
-                let difference = ((mouseEvent.y - event.y) / 10);
-                difference = Math.round(difference/this.option.increment)*this.option.increment;
-                this.input.value = (new Number(mouseEvent.strength) + difference).toFixed(1);
+                let difference = (mouseEvent.y - event.y) / 10;
+                difference =
+                    Math.round(difference / this.option.increment) *
+                    this.option.increment;
+                this.input.value = (
+                    new Number(mouseEvent.strength) + difference
+                ).toFixed(1);
             }
         },
         onBlur(event) {
@@ -97,6 +103,24 @@ export default {
 
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+}
+
+select {
+    font-family: $font;
+    width: 55px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid rgb(59, 59, 59);
+    background-color: $element-backgroundlight;
+}
+
+select:focus {
+    outline: none;
+    border: 1px solid rgb(255, 255, 222);
+}
+
+option{
+    
 }
 </style>
 

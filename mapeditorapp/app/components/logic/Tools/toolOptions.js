@@ -34,7 +34,7 @@ export class Option {
 
 export class NumberOption extends Option {
 	constructor(name, value, min, max, increment) {
-		super(name, value, "NUMBER");
+		super(name, value, OptionType.NUMBER);
 		this.increment = increment ? increment : 1;
 		this._min = min != null ? min : -Number.MAX_VALUE;
 		this._max = max != null ? max : Number.MAX_VALUE;
@@ -56,7 +56,7 @@ export class NumberOption extends Option {
 
 export class TextOption extends Option {
 	constructor(name, value, placeholder) {
-		super(name, value, "TEXT");
+		super(name, value, OptionType.TEXT);
 		this._placeholder = placeholder;
 	}
 
@@ -73,6 +73,33 @@ export class TextOption extends Option {
 		return new TextOption(this._name, this._value, this._placeholder);
 	}
 }
+
+export class ChoiceOption extends Option {
+	constructor(name, choices) {
+        super(name, choices[0], OptionType.CHOICE);
+        this.choices = choices;
+	}
+
+	get value() {
+		return this._value;
+	}
+
+	set value(value) {
+		this._value = this.choices[value];
+		this._onChanged(this._name, this._value);
+	}
+
+	copy() {
+		return new TextOption(this._name, this._value, this._placeholder);
+	}
+}
+
+export const OptionType = {
+    TEXT: "TEXT",
+    CHOICE: "CHOICE",
+    NUMBER: "NUMBER"
+}
+
 export class Options {
 	constructor(toolOptions, brushOptions) {
 		this.tools = {};

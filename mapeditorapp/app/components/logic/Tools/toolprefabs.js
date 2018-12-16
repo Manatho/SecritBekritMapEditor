@@ -1,9 +1,9 @@
 import { Tool} from "./tools";
 import { Controller } from "../controller";
 import { Town } from "../TerrainObjects/town";
-import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "../constants";
+import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX, ListIndustries } from "../constants";
 import { Industry } from "../TerrainObjects/industry";
-import { NumberOption, Options, TextOption } from "./toolOptions";
+import { NumberOption, Options, TextOption, ChoiceOption } from "./toolOptions";
 
 let strengthOption = new NumberOption("strength", 1);
 let sizeOption = new NumberOption("size", 5, 1);
@@ -71,7 +71,9 @@ function townplacer(tool, toolableVertices) {
 }
 
 let industryNameOption = new TextOption("name", "", "industry");
-let industryTool = new Tool("", { brushscaler: placementBrush, tooling: industryPlacer }, new Options([industryNameOption], []));
+let angleOption = new NumberOption("angle", 1, 0, 360, 1);
+let industryOption = new ChoiceOption("Industry", ListIndustries());
+let industryTool = new Tool("", { brushscaler: placementBrush, tooling: industryPlacer }, new Options([industryNameOption, angleOption, industryOption], []));
 industryTool.name = "town";
 
 function industryPlacer(tool, toolableVertices) {
