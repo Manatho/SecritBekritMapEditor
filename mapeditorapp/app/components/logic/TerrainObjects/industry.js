@@ -79,7 +79,7 @@ class Industry {
 
 		position.index = savedObject.positionIndex;
 		position = new ToolableVertex(position, mesh, 0, 0);
-		return new Industry(savedObject.name, position, savedObject.industry, savedObject.industry);
+		return new Industry(savedObject.name, position, savedObject.industry, savedObject.angle);
 	}
 }
 

@@ -68,6 +68,7 @@ class TerrainObjects {
 	save() {
 		let data = {};
 		data.towns = [];
+		data.industries = [];
 		this.towns.forEach(town => {
 			data.towns.push(town.save());
 		});
