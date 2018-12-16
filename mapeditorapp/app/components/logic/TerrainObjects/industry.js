@@ -3,47 +3,64 @@ import { Controller } from "../controller.js";
 
 let THREE = require("../../../libs/threemin.js");
 
+let size = 130;
+let offset = -size/2;
+let shape = new THREE.Shape();
+shape.moveTo(offset, offset);
+shape.lineTo(offset, offset + size);
+shape.lineTo(offset + size/2, offset + size + size/3);
+shape.lineTo(offset + size, offset + size);
+shape.lineTo(offset + size, offset);
+shape.lineTo(offset, offset);
+
+let extrudeSettings = {
+    steps: 2,
+    depth: 100,
+	bevelEnabled: false
+};
+
 class Industry {
 	/**
 	 *
 	 * @param {string} name
 	 * @param {ToolableVertex} position
-     * @param {Number} angle - Degrees
+	 * @param {Number} angle - Degrees
 	 * @param {string} industry
 	 */
 	constructor(name, position, industry, angle) {
 		this.name = name;
-        this.industry = industry;
+		this.industry = industry;
 		this.type = "INDUSTRY";
 
 		this._position = position;
 
 		let material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true });
+		let geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
-		let geometry = new THREE.BoxGeometry(130, 100, 130);
 		this.mesh = new THREE.Mesh(geometry, material);
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;
-		this.mesh.position.y = position.y;
-        this.mesh.position.z = position.z;
+		this.mesh.position.y = position.y + 50;
+		this.mesh.position.z = position.z;
+		this.mesh.rotation.x = Math.PI / 2;
 
-        this.angle = angle;
+		this.angle = angle;
 	}
 	get position() {
 		return this.mesh.position;
-    }
-    set angle(newAngle){
-        this._angle = newAngle % 360;
-        this.mesh.rotation.y = Math.PI/180 * this.angle;
-        Controller.requestRender();
-    }
-    get angle(){
-        return this._angle;
-    }
-	hovered(){
+	}
+	set angle(newAngle) {
+		this._angle = newAngle % 360;
+		this.mesh.rotation.z = -(Math.PI / 180) * this.angle;
+		Controller.requestRender();
+	}
+	get angle() {
+		return this._angle;
+	}
+	hovered() {
 		this.mesh.material.opacity = 0.3;
 	}
-	unhovered(){
+	unhovered() {
 		this.mesh.material.opacity = 0.7;
 	}
 	updatePosition() {
@@ -59,19 +76,21 @@ class Industry {
 		this.mesh.geometry = null;
 		this.mesh.material.dispose();
 		this.mesh.material = null;
-        this.mesh = null;
-        this.unhovered = () => {}
-		this.hovered = () => {}
+		this.mesh = null;
+		this.unhovered = () => {};
+		this.hovered = () => {};
 	}
-	toLuaString(){
-		return `{ pos = { ${this.position.x}, ${-this.position.z} }, angle = math.rad(${this.angle}), name = _("${this.name}"), fileName = "industry/${this.industry}.con"},\n`
+	toLuaString() {
+		return `{ pos = { ${this.position.x}, ${-this.position.z} }, angle = math.rad(${this.angle}), name = _("${
+			this.name
+		}"), fileName = "industry/${this.industry}.con"},\n`;
 	}
 	save() {
 		let saveObject = {};
 		saveObject.name = this.name;
-        saveObject.type = this.type;
-        saveObject.angle = this.angle;
-        saveObject.industry = this.industry;
+		saveObject.type = this.type;
+		saveObject.angle = this.angle;
+		saveObject.industry = this.industry;
 		saveObject.positionIndex = this._position.getIndex();
 		saveObject.positionMeshName = this._position.getMeshName();
 		return saveObject;
