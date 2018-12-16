@@ -1,28 +1,26 @@
 import { ToolableVertex } from "../terrain.js";
-import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "../constants.js";
 
 let THREE = require("../../../libs/threemin.js");
 
-const normalTownArea = Math.PI * (400*400) //circle area;
-
-class Town {
+class Industry {
 	/**
 	 *
 	 * @param {string} name
 	 * @param {ToolableVertex} position
-	 * @param {Number} sizeFactor
+     * @param {Number} angle - Degrees
+	 * @param {string} industry
 	 */
-	constructor(name, position, sizeFactor) {
+	constructor(name, position, industry, angle) {
 		this.name = name;
-		this._sizeFactor = sizeFactor;
-		this.type = "TOWN";
+        this.industry = industry;
+        this.angle = angle;
+		this.type = "INDUSTRY";
 
 		this._position = position;
 
-		let material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true });
+		let material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true });
 
-		let radius = Math.sqrt((normalTownArea * (sizeFactor*0.8))/Math.PI);
-		let geometry = new THREE.CylinderGeometry(radius, radius, 100, 20);
+		let geometry = new THREE.BoxGeometry(130, 130, 100);
 		this.mesh = new THREE.Mesh(geometry, material);
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;
@@ -31,17 +29,6 @@ class Town {
 	}
 	get position() {
 		return this.mesh.position;
-	}
-	get sizeFactor(){
-		return this._sizeFactor;
-	}
-	set sizeFactor(size){
-		this._sizeFactor = Math.min(Math.max(size, TOWN_SIZE_FACTOR_MIN), TOWN_SIZE_FACTOR_MAX);
-		let scale = Math.sqrt((normalTownArea * (this._sizeFactor*0.8))/Math.PI) / this.mesh.geometry.parameters.radiusTop;
-		console.log(scale);
-		this.mesh.scale.x = scale;
-		this.mesh.scale.z = scale;
-		
 	}
 	hovered(){
 		this.mesh.material.opacity = 0.3;
@@ -63,16 +50,17 @@ class Town {
 		this.mesh.geometry = null;
 		this.mesh.material.dispose();
 		this.mesh.material = null;
-		this.mesh = null;
-		this.unhovered = () => {}
+        this.mesh = null;
+        this.unhovered = () => {}
 		this.hovered = () => {}
 	}
 
 	save() {
 		let saveObject = {};
 		saveObject.name = this.name;
-		saveObject.sizeFactor = this.sizeFactor;
-		saveObject.type = this.type;
+        saveObject.type = this.type;
+        saveObject.angle = this.angle;
+        saveObject.industry = this.industry;
 		saveObject.positionIndex = this._position.getIndex();
 		saveObject.positionMeshName = this._position.getMeshName();
 		return saveObject;
@@ -89,8 +77,8 @@ class Town {
 
 		position.index = savedObject.positionIndex;
 		position = new ToolableVertex(position, mesh, 0, 0);
-		return new Town(savedObject.name, position, savedObject.sizeFactor);
+		return new Industry(savedObject.name, position, savedObject.industry, savedObject.industry);
 	}
 }
 
-export { Town };
+export { Industry };

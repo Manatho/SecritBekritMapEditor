@@ -74,8 +74,6 @@ export const Controller = {
 		eventbus.$emit(ControllerEvents.Event_Terrain_object_Removed, terrainObject);
 	},
 	terrainObjectSelected(terrainObject){
-		console.log("Hej");
-		
 		eventbus.$emit(ControllerEvents.Event_Terrain_Object_Selected, terrainObject);
 	},
 	deselectTerrainObject(){

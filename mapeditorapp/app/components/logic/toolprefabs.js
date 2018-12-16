@@ -2,6 +2,7 @@ import { Tool, Options, NumberOption, TextOption } from "./tools";
 import { Controller } from "./controller";
 import { Town } from "./TerrainObjects/town";
 import { TOWN_SIZE_FACTOR_MIN, TOWN_SIZE_FACTOR_MAX } from "./constants";
+import { Industry } from "./TerrainObjects/industry";
 
 let strengthOption = new NumberOption("strength", 1);
 let sizeOption = new NumberOption("size", 5, 1);
@@ -75,8 +76,7 @@ industryTool.name = "town";
 function industryPlacer(tool, toolableVertices) {
 	if (toolableVertices.length > 0) {
 		console.log("Industry");
-		
-		//Controller.addTerrainObject(new Town(tool.toolOptions.name.value, toolableVertices[0][0], tool.toolOptions.size_factor.value));
+		Controller.addTerrainObject(new Industry(tool.toolOptions.name.value, toolableVertices[0][0],"test", 0));
 	}
 }
 
