@@ -6,7 +6,7 @@
 		<NewTerrain ref="newterrain"></NewTerrain>
 		<ImportTerrain ref="importterrain"></ImportTerrain>
 		<Progressbar></Progressbar>
-		<p class="versioning">Version 0.4 (Alpha)</p>
+		<p class="versioning">Version 0.5 (Alpha)</p>
     </div>
 </template>
 
