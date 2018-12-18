@@ -1,5 +1,5 @@
 import pako from "pako";
-import { StringDecoder } from "string_decoder";
+import { TerrainObjects } from "./TerrainObjects/terrainObjects";
 
 let THREE = require("../../libs/threemin.js");
 
@@ -28,18 +28,12 @@ let terrainMaterial = new THREE.RawShaderMaterial({
 	fragmentShader: require("./terrainShader/terrainShader.frag")
 });
 
-let planeWireMaterial = new THREE.MeshBasicMaterial({
-	color: 0x000000,
-	wireframe: true,
-	transparent: true,
-	opacity: 0.05
-});
-
 class Terrain {
 	static get PIXEL_PER_METER() {
 		return PIXEL_PER_METER;
 	}
 	constructor(name, mapsize, indiceworldsize, indiceSize, baseline, min, max) {
+		this.terrainObjects = new TerrainObjects();
 		this.name = name;
 		this.mapSize = mapsize;
 		this.indiceWorldSize = indiceworldsize * PIXEL_PER_METER;
@@ -148,6 +142,9 @@ class Terrain {
 		});
 
 		this.updateGeometries(this._meshes.map(x => x.geometry));
+	}
+	getMesh(name) {
+		return this._meshes.find(x => x.name === name);
 	}
 	getAffectedMeshesAndVertices(raycaster, brush2d) {
 		// the mesh clicked is found:
@@ -288,6 +285,7 @@ class Terrain {
 			name: this.name,
 			min: this.min,
 			max: this.max,
+			terrainObjects: this.terrainObjects.save(),
 			baseline: this.baseline,
 			mapsize: this.mapSize,
 			indiceWorldSize: this.indiceWorldSize / PIXEL_PER_METER,
@@ -308,8 +306,6 @@ class Terrain {
 		element.style.display = "none";
 		element.click();
 		element = null;
-
-		console.log("Done");
 	}
 	static async load(file, progress) {
 		const terrain = await new Promise(function(resolve, reject) {
@@ -323,6 +319,7 @@ class Terrain {
 
 				let terrain = new Terrain(ts.name, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
 				terrain.setHeights(ts.heightData);
+				terrain.terrainObjects = TerrainObjects.load(ts.terrainObjects, terrain);
 				resolve(terrain);
 			});
 			reader.readAsArrayBuffer(file);
@@ -510,6 +507,14 @@ class ToolableVertex {
 		vertex.applyMatrix4(this._meshes[0].matrixWorld);
 		return { x: vertex.x, y: vertex.y, z: vertex.z };
 	}
+
+	getIndex() {
+		return this._vertices[0].index;
+	}
+
+	getMeshName() {
+		return this._meshes[0].name;
+	}
 }
 
-export { Terrain };
+export { Terrain, ToolableVertex };

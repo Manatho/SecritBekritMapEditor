@@ -70,7 +70,13 @@ export default {
 									'" into the map folder of the game. \r\n\r\nThe TransportFever map folder can be found by going to your: \r\nSteam Library -> right clicking TransportFever -> Properties -> Local Files -> Browse Local Files  \r\n\r\nEnjoy! :)'
 							);
 							zip.folder(mapname);
-							zip.file(mapname + "/map.lua", create({ name: mapname }));
+							zip.file(mapname + "/map.lua", create(
+								{ 
+									name: mapname, 
+									towns: Controller.terrainObjects.createTownString(),
+									industries: Controller.terrainObjects.createIndustryString() 
+									
+									}));
 							zip.file(mapname + "/heightmap.png", Controller.pngData, { binary: true });
 
 							zip.generateAsync({ type: "blob" }).then(function(blob) {

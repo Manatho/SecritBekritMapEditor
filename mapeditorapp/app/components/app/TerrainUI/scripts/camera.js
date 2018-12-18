@@ -135,12 +135,13 @@ let onDocumentMouseDown = event => {
 	onMouseDownPosition.y = event.clientY;
 };
 
-let onDocumentMouseMove = event => {
+let onDocumentMouseMove = (event, render) => {
 	event.preventDefault();
 	if (InputController.mouseDownEvent.button == 1 && InputController.isMouseDown) {
 		theta = -((event.clientX - onMouseDownPosition.x) * 0.5) + onMouseDownTheta;
 		phi = (event.clientY - onMouseDownPosition.y) * 0.5 + onMouseDownPhi;
 		phi = Math.min(179, Math.max(0.1, phi));
+		render();
 	}
 };
 

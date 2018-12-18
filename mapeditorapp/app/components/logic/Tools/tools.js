@@ -1,61 +1,11 @@
-export class Option {
-	constructor(name, value, min, max) {
-		this._name = name;
-		this._value = value;
-		this._min = min != null ? min : -Number.MAX_VALUE;
-		this._max = max != null ? max : Number.MAX_VALUE;
-		this._onChanged = () => {};
-	}
-
-	set onChange(method) {
-		this._onChanged = method;
-	}
-
-	get name() {
-		return this._name;
-	}
-
-	get min() {
-		return this._min;
-	}
-
-	get max() {
-		return this._max;
-	}
-
-	get value() {
-		return this._value;
-	}
-
-	set value(value) {
-		this._value = Math.max(Math.min(value, this._max), this._min);
-		this._onChanged(this._name, this._value);
-	}
-
-	copy() {
-		return new Option(this._name, this._value, this._min, this._max);
-	}
-}
-
-export class Options {
-	constructor(toolOptions, brushOptions) {
-		this.tools = {};
-		this.brush = {};
-		this.all = [];
-
-		toolOptions.forEach(option => {
-			this.tools[option.name] = option;
-			this.all.push(option);
-		});
-		brushOptions.forEach(option => {
-			this.brush[option.name] = option;
-			this.all.push(option);
-		});
-	}
-}
+import { Options } from "./toolOptions";
 
 export class Tool {
 	constructor(brushtype, methods, options) {
+		if (options == null) {
+			options = new Options([], []);
+		}
+
 		this.options = options.all;
 
 		this.toolOptions = options.tools;
