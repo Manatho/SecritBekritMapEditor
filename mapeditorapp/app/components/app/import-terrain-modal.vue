@@ -13,6 +13,8 @@
 			<button @click="uploadTerrain" class="button">Import</button>
 			<div v-show="fileimported" style="width: 100%; display:flex; flex-direction:column;">
 				<input class="textinput" v-model="name" name="importName" placeholder="Name" @keyup.enter="blur" @keypress="onkey">
+				<input class="textinput" v-model="author" name="importAuthor" placeholder="Author" @keyup.enter="blur">
+				<input class="textinput" v-model="profile" name="importProfile" placeholder="Steam Profile" @keyup.enter="blur">
 				<div class="canvas-container"><canvas ref="canvasImage"></canvas> <canvas ref="canvasOverlay"></canvas></div>
 				<div class="setting">
 					<div style="display:flex">
@@ -105,8 +107,12 @@ export default {
 					floatdata[i] = MyMath.lerp(data[i], 0, 65536, this.minheight, this.maxheight);
 				}
 				data = null;
-				let name = this.name == "" ? "map" : this.name;
-				Controller.createNewTerrain(name, image.width - 1, this.selectedScale);
+				let meta = {
+					name: this.name == "" ? "map" : this.name,
+					author: this.author,
+					profile: this.profile
+				};
+				Controller.createNewTerrain(meta, image.width - 1, this.selectedScale);
 				Controller.terrain.setHeights(floatdata);
 				this.render = false;
 				Progressbar.stop();
@@ -156,7 +162,8 @@ export default {
 			maxheight: TERRAIN_MAX_HEIGHT,
 			selectedScale: 4,
 			name: "",
-
+			author: "",
+			profile: "",
 			//Canvas
 			canvas: null,
 			layer1: null,
