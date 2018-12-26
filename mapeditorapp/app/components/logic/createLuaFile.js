@@ -4,7 +4,7 @@ const placeholders = {
 	towns: { placeholder: "%towns%", default: "" },
 	industries: { placeholder: "%industries%", default: "" },
 	author: { placeholder: "%author%", default: "" },
-	steam: { placeholder: "%steam%", default: "" },
+	profile: { placeholder: "%profile%", default: "" },
 	name: { placeholder: "%name%", default: "map" },
 	description: { placeholder: "%description%", default: "" },
 	seed: { placeholder: "%seed%", default: "" }
@@ -24,7 +24,7 @@ function data() return {
     {
       name         = '${placeholders.author.placeholder}',
       role         = 'CREATOR',
-      steamProfile = '${placeholders.steam.placeholder}'
+      steamProfile = '${placeholders.profile.placeholder}'
     },
     {
       name         = 'TransportFeverMapEditor',

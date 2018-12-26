@@ -42,14 +42,14 @@ export const Controller = {
 	get scaling() {
 		return scaling;
 	},
-	createNewTerrain(name, size, scale) {
+	createNewTerrain(meta, size, scale) {
 		let actualSize = size / scale;
 		let indiceSize = findBestIndiceSize(128, actualSize);
 		let baselineheight = 150; //Meters
 		let indiceCount = actualSize / indiceSize;
 		let indiceworldsize = ((size / 1024) * 1000) / indiceCount;
 
-		terrain = new Terrain(name, actualSize, indiceworldsize, indiceSize, baselineheight, TERRAIN_MIN_HEIGHT, TERRAIN_MAX_HEIGHT);
+		terrain = new Terrain(meta, actualSize, indiceworldsize, indiceSize, baselineheight, TERRAIN_MIN_HEIGHT, TERRAIN_MAX_HEIGHT);
 		scaling = scale;
 
 		eventbus.$emit(ControllerEvents.Event_Terrain_Changed, terrain);

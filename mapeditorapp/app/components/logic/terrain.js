@@ -32,9 +32,9 @@ class Terrain {
 	static get PIXEL_PER_METER() {
 		return PIXEL_PER_METER;
 	}
-	constructor(name, mapsize, indiceworldsize, indiceSize, baseline, min, max) {
+	constructor(meta, mapsize, indiceworldsize, indiceSize, baseline, min, max) {
 		this.terrainObjects = new TerrainObjects();
-		this.name = name;
+		this.meta = meta;
 		this.mapSize = mapsize;
 		this.indiceWorldSize = indiceworldsize * PIXEL_PER_METER;
 		this.min = Math.max(0, min);
@@ -73,6 +73,10 @@ class Terrain {
 			}
 		}
 		setNeighbours(this._meshes, indiceCount);
+	}
+
+	get name(){
+		return this.meta.name;
 	}
 
 	addToScene(scene) {
@@ -283,7 +287,7 @@ class Terrain {
 		heightdata = pako.deflate(bytes, { level: 9, windowBits: 8, strategy: 1 });
 
 		let savedTerrain = {
-			name: this.name,
+			meta: this.meta,
 			min: this.min,
 			max: this.max,
 			terrainObjects: this.terrainObjects.save(),
@@ -318,7 +322,7 @@ class Terrain {
 				let ts = JSON.parse(text);
 				ts.heightData = new Float64Array(pako.inflate(ts.heightData).buffer);
 
-				let terrain = new Terrain(ts.name, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
+				let terrain = new Terrain(ts.meta, ts.mapsize, ts.indiceWorldSize, ts.indiceSize, ts.baseline, ts.min, ts.max);
 				terrain.setHeights(ts.heightData);
 				terrain.terrainObjects = TerrainObjects.load(ts.terrainObjects, terrain);
 				resolve(terrain);

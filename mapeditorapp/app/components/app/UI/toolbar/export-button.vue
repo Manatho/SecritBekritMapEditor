@@ -73,6 +73,8 @@ export default {
 							zip.file(mapname + "/map.lua", create(
 								{ 
 									name: mapname, 
+									author: Controller.terrain.meta.author,
+									profile: Controller.terrain.meta.profile,
 									towns: Controller.terrainObjects.createTownString(),
 									industries: Controller.terrainObjects.createIndustryString() 
 									
