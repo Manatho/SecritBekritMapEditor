@@ -1,5 +1,6 @@
 import { Town } from "./town";
 import { Industry } from "./industry";
+import { Controller } from "../controller";
 class TerrainObjects {
 	constructor() {
 		/** @type {Town[]} */ this.towns = [];
@@ -23,6 +24,7 @@ class TerrainObjects {
 			arrayRemove(this.industries, object);
 		}
 		arrayRemove(this.meshes, object.mesh);
+		Controller.requestRender();
 	}
 	updatePosition() {
 		this.towns.forEach(town => {
@@ -79,12 +81,14 @@ class TerrainObjects {
 	}
 	static load(savedTerrainobjects, terrain) {
 		let terrainObjects = new TerrainObjects();
-		savedTerrainobjects.towns.forEach(town => {
-			terrainObjects.add(Town.load(town, terrain));
-		});
-		savedTerrainobjects.industries.forEach(industry => {
-			terrainObjects.add(Industry.load(industry, terrain));
-		});
+		if(savedTerrainobjects != undefined){
+			savedTerrainobjects.towns.forEach(town => {
+				terrainObjects.add(Town.load(town, terrain));
+			});
+			savedTerrainobjects.industries.forEach(industry => {
+				terrainObjects.add(Industry.load(industry, terrain));
+			});
+		}
 		return terrainObjects;
 	}
 }

@@ -4,7 +4,7 @@ import { Controller } from "../controller.js";
 
 let THREE = require("../../../libs/threemin.js");
 
-const normalTownArea = Math.PI * (400*400) //circle area;
+const normalTownArea = Math.PI * (280*280) //circle area;
 
 class Town {
 	/**
@@ -51,7 +51,7 @@ class Town {
 		this.mesh.material.opacity = 0.7;
 	}
 	updatePosition() {
-		this.mesh.position.y = this._position.height + 150;
+		this.mesh.position.y = this._position.height + this._position.baseline;
 	}
 
 	addToScene(scene) {

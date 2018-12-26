@@ -3,6 +3,7 @@ import { Controller } from "../controller.js";
 
 let THREE = require("../../../libs/threemin.js");
 
+let height = 100;
 let size = 130;
 let offset = -size/2;
 let shape = new THREE.Shape();
@@ -15,7 +16,7 @@ shape.lineTo(offset, offset);
 
 let extrudeSettings = {
     steps: 2,
-    depth: 100,
+    depth: height,
 	bevelEnabled: false
 };
 
@@ -40,7 +41,7 @@ class Industry {
 		this.mesh = new THREE.Mesh(geometry, material);
 		position = position.getWorldPosition();
 		this.mesh.position.x = position.x;
-		this.mesh.position.y = position.y + 50;
+		this.mesh.position.y = position.y + height/2;
 		this.mesh.position.z = position.z;
 		this.mesh.rotation.x = Math.PI / 2;
 
@@ -64,7 +65,7 @@ class Industry {
 		this.mesh.material.opacity = 0.7;
 	}
 	updatePosition() {
-		this.mesh.position.y = this._position.height + 150;
+		this.mesh.position.y = this._position.height + this._position.baseline + height/2;
 	}
 
 	addToScene(scene) {

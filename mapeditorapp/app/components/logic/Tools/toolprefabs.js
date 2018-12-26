@@ -6,7 +6,7 @@ import { Industry } from "../TerrainObjects/industry";
 import { NumberOption, Options, TextOption, ChoiceOption } from "./toolOptions";
 
 let strengthOption = new NumberOption("strength", 1);
-let sizeOption = new NumberOption("size", 5, 1);
+let sizeOption = new NumberOption("size", 30, 1);
 let raiseTool = new Tool("gauss", null, new Options([strengthOption], [sizeOption]));
 
 let averageTool = new Tool("", { brushscaler: averageBrush, tooling: average }, new Options([], [sizeOption.copy()]));

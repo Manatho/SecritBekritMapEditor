@@ -247,6 +247,7 @@ class Terrain {
 					indexedVertices[element.index.y][element.index.x] = new ToolableVertex(
 						element.vertex,
 						element.mesh,
+						this.baseline,
 						this.min - this.baseline,
 						this.max - this.baseline
 					);
@@ -480,7 +481,7 @@ function newMap2dTo1d(x, y, size, mesh) {
 }
 
 class ToolableVertex {
-	constructor(vertices, meshes, min, max) {
+	constructor(vertices, meshes, baseline, min, max) {
 		if (!Array.isArray(vertices)) {
 			vertices = [vertices];
 			meshes = [meshes];
@@ -489,6 +490,11 @@ class ToolableVertex {
 		this._meshes = meshes;
 		this._min = min;
 		this._max = max;
+		this._baseline = baseline;
+	}
+
+	get baseline(){
+		return this._baseline;
 	}
 
 	set height(value) {
