@@ -18,15 +18,17 @@ grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
 let rockTexture = textureLoader.load(require("./terrainShader/textures/rocks.jpg"));
 rockTexture.wrapS = rockTexture.wrapT = THREE.RepeatWrapping;
 
-let terrainUniforms = {
+let TerrainUniforms = {
 	grassTexture: { type: "t", value: grassTexture },
-	rockTexture: { type: "t", value: rockTexture }
+	rockTexture: { type: "t", value: rockTexture },
+	drawContour: {type: "bool", value: false}
 };
 let terrainMaterial = new THREE.RawShaderMaterial({
-	uniforms: terrainUniforms,
+	uniforms: TerrainUniforms,
 	vertexShader: require("./terrainShader/terrainShader.vert"),
 	fragmentShader: require("./terrainShader/terrainShader.frag")
 });
+terrainMaterial.extensions.derivatives = true;
 
 class Terrain {
 	static get PIXEL_PER_METER() {
@@ -527,4 +529,4 @@ class ToolableVertex {
 	}
 }
 
-export { Terrain, ToolableVertex };
+export { Terrain, ToolableVertex, TerrainUniforms };

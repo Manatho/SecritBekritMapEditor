@@ -6,6 +6,12 @@
             <div class="height-output">
                 Height:
                 <span class="height-number">{{toolCenteredVertex.y.toFixed(0)}}m</span>
+                <br>
+                <label class="container">
+                    <span>Show contour:</span>
+                    <input type="checkbox" v-model="contour" @change="onContour">
+                    <span class="checkmark"></span>
+                </label>
             </div>
         </div>
     </div>
@@ -21,7 +27,7 @@ let InputController = require("./scripts/input.js").Controller;
 let Camera = require("./scripts/camera.js").Camera;
 let ToolEffect = require("./scripts/tool-effect-visualiser.js").ToolEffect;
 import { Controller, ControllerEvents } from "../../logic/controller.js";
-import { Terrain } from "../../logic/terrain.js";
+import { Terrain, TerrainUniforms } from "../../logic/terrain.js";
 let scene;
 
 function initAddons() {
@@ -47,11 +53,15 @@ function setupToolApply() {
                 raycaster.setFromCamera(mouse3D, Camera.ThreeCamera);
                 Controller.applyTool(raycaster, event.button);
             } else if (townIntersect.length > 0) {
-                if(event.button == 2){
+                if (event.button == 2) {
                     Controller.deselectTerrainObject();
-                    Controller.removeTerrainObject(townIntersect[0].object.owner);
-                } else if(event.button == 0){
-                    Controller.terrainObjectSelected(townIntersect[0].object.owner)
+                    Controller.removeTerrainObject(
+                        townIntersect[0].object.owner
+                    );
+                } else if (event.button == 0) {
+                    Controller.terrainObjectSelected(
+                        townIntersect[0].object.owner
+                    );
                 }
             }
         } else {
@@ -182,11 +192,16 @@ export default {
         window.scene = scene;
     },
     data() {
-        console.log(ToolEffect);
-
         return {
-            toolCenteredVertex: ToolEffect.centeredVertex
+            toolCenteredVertex: ToolEffect.centeredVertex,
+            contour: TerrainUniforms.drawContour.value
         };
+    },
+    methods: {
+        onContour(event) {
+            TerrainUniforms.drawContour.value = this.contour;
+            Controller.requestRender();
+        }
     }
 };
 </script>
@@ -217,11 +232,62 @@ export default {
 
 .height-number {
     background-color: $element-backgroundlight;
-    //border: $element-border;
     border-radius: 5px;
     padding: 1px;
     font-size: 1.1em;
     font-weight: bold;
+}
+
+.container {
+    display: block;
+    position: relative;
+    margin-top: 5px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    background-color: $element-backgroundlight;
+    border-radius: 3px;
+    margin-left: 3px;
+}
+
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+    display: block;
+    content: "x";
+}
+
+.container .checkmark:after {
+    display: inline-block;
+    content: "";
+    font-weight: bold;
+    font-size: 1em;
+    margin-left: 2px;
+    margin-top: -2px;
 }
 </style>
 
