@@ -30,7 +30,6 @@ void main() {
     lowp float slope = pow(dot(vNormal, vec3(0,0,1.0)), 2.0);
     mediump vec4 slopeTexture = slope * grassColor + (1.0 - slope) * rockColor;
     
-    
     lowp vec4 contour = vec4(1.0,1.0,1.0,1.0);
     if(drawContour){
         lowp float df = fwidth(wPosition.y);
